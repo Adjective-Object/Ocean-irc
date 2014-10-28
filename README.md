@@ -21,35 +21,36 @@ an irc client/bot pair for implementing slack-like functionality
 - `#channel` links
 - `:emoticons:`
 
-###client side features:
+###client features
 - notifications on specific words
 - Text expansions / macros
 
 ###etc
-- Extensible
-- Log everything said in public channels and direct messages
-- Anything said in dms should be retrievable only by the people in the direct messages
+- Plugin Driven and Extensible
+- Log everything said in public channels and direct messages between ocean users
+	- Anything said in dms should be retrievable only by the people in the direct messages 
 
 ##Observations
 
 - External service integrations (i.e. a chat message when a git branch is pushed to, etc) can already be implemented in vanilla irc with bots.
 
-- Irc's existing commands are all formatted as `/command`. Therefore, in order to mesh well with existing services, custom Ocean commands should be prefixed with `/` (i.e `/hangouts`, `/yo`, &c)
+- Irc's existing commands are all formatted as `/command`. Therefore, in order to mesh well with existing services, custom ocean commands should be prefixed with `/` (i.e `/hangouts`, `/yo`, &c)
 
 
 
 ##Protocol
 The ocean-bot Protocol is designed to work with ircd-ratbox
-Many servers work similarly, but we shouldn’t worry about getting exact behavior matches
+Many servers work similarly, but we shouldn't worry about getting exact behavior matches
 
 ###Ocean-Bot Protocol
 1. ocean-bot connects to a server  
 2. sets nick if nick “ocean-bot” is unavailable, panic and quit  
 3. joins channel #general  
-4. calls `/names`, checks that it is a server OP (that its name is prepended with @, i.e. @ocean-bot)
+4. calls `/names`, checks that it is a server op 
+	(that its name is prepended with @, i.e. @ocean-bot)
 
 5. calls `/list`, attempts to join all channels displayed this way  
-6. (note that server ops can see any channel on the server, even ones with mode +s +p)
+	(note that server ops can see any channel on the server, even ones with mode +s +p)
 
 7. ocean-bot then sit in all the joined channels and logs messages while waiting for clients to query it with messages
 
@@ -60,6 +61,7 @@ Many servers work similarly, but we shouldn’t worry about getting exact behavi
 1. On connecting to the server, a client calls `/whois ocean-bot`
 	- if no client is found, ocean-client enters `simple` mode
 	- when in simple mode, ocean-client notifies all client-server plugins
+2. send an "init" message to Oceanbot
 
 ##Plugins
 
@@ -154,9 +156,43 @@ Its `generate-init-params` and `parse-init-params` functions act the same way as
 Its `parse-init-params` takes the output of `generate-init-params`, and returns a list of the names of new emoticons
 
 the emoticon-text uses lazy fetching for emoticons
-(i.e. when an emoticon is received / recognized it is defaulted to a placeholder while the emoticon is fetched by ocean-bot)
+emoticons are not loaded until they are mentioned in chat, at which point it is fetched from ocean-bot and inserted into the text.
+
+For example, the first time a user recieves the `:laugh:` emoticon, the outgoing message is formatted like this:
+```
+"emoticon-text": {"fetch-icons"[ "laugh" ]}
+```
+
+and the response from ocean-bot:
+```
+"emoticon-text": {
+	"icons":{
+		"laugh": <payload>
+	}
+}
+```
+
+where `<payload>` is a base-64 encoded string of the raw dump of the png of the emoticon.
 
 emoticon-text also registers its emoticons with the [tab completion plugin](#tab-completion) for tab completion
+
+####user-manager
+manager for usernames and user icons
+
+Its `generate-init-params` and `parse-init-params` functions act the same way as `text-expand` (see above)
+
+Its `parse-init-params` takes the output of `generate-init-params`, and returns a list of the names of users and their user icons that have changed since the last update, formatted like so:
+
+```
+"user-manager":{
+	<username>: {
+		"real-name": "Mr. Real Namington"
+		"user-icon": <payload>
+	}
+}
+```
+
+where `<payload>` is a base-64 encoded string of the raw dump of the png of the user icon
 
 ####pm-logger
 plugin to keep an encrypted copy of all personal messages in a database on ocean-bot.
