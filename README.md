@@ -39,7 +39,6 @@ an irc client/bot pair for implementing slack-like functionality
 - Irc's existing commands are all formatted as `/command`. Therefore, in order to mesh well with existing services, custom ocean commands should be prefixed with `/` (i.e `/hangouts`, `/yo`, &c)
 
 
-
 ##Protocol
 The ocean-bot Protocol is designed to work with ircd-ratbox
 Many servers work similarly, but we shouldn't worry about getting exact behavior matches
@@ -267,7 +266,7 @@ this document only aims to cover the basic functionality of the Ocean client-ser
 4. A GUI in ocean-client for managing plugins
 	- maybe using git repos and have a curated list?
 5. markdown parsing in messages
-6. yeah idk what else. 
+6. Color theming with a generic theme.json
 
 ##Finishing Notes
 This is stuff we will probably end up using over the course of the hackathon, so if its relevant to you, read up.
