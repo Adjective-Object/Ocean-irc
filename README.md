@@ -2,6 +2,8 @@
 
 an irc client/bot pair for implementing slack-like functionality
 
+(a reminder: this is all by max right now. everything is up for discussion)
+
 ##Design Goals
 
 - The bot/client pair should be able to run on any irc server, and be invisible to users not running ocean-client
@@ -65,6 +67,8 @@ Many servers work similarly, but we shouldn't worry about getting exact behavior
 
 ##Plugins
 
+More or less all of the desired features can be implemented with the following plugin system
+
 ###Event Hooks
 plugins in ocean can register for a series of events to listen for, that will be fired for every item in the listener list whenever the corresponding action happens.
 
@@ -73,9 +77,9 @@ the events are as follows:
 `message-recv` is triggered whenever a message is received
 `keystroke` is triggered whenever a keystroke is handled
 
+
 ###Load Order
 because of interdependence between plugins, loading order matters. All local plugins are loaded before Client-Server plugins. Within those categorizations, plugins use the `priority` attribute defined in their `plugin-name.json` file.
-
 
 
 ###Client-Server Plugins 
@@ -166,9 +170,9 @@ For example, the first time a user recieves the `:laugh:` emoticon, the outgoing
 and the response from ocean-bot:
 ```
 "emoticon-text": {
-	"icons":{
-		"laugh": <payload>
-	}
+	"icons":[
+		{   "name": "laugh"
+			"payload": <payload>}
 }
 ```
 
@@ -185,14 +189,25 @@ Its `parse-init-params` takes the output of `generate-init-params`, and returns 
 
 ```
 "user-manager":{
-	<username>: {
-		"real-name": "Mr. Real Namington"
-		"user-icon": <payload>
-	}
+	"known-users": [
+		{   "username": "weeaboo"
+			"real-name": "Mr. Real Namington"
+			"user-icon": <payload>},
+		...
 }
 ```
 
 where `<payload>` is a base-64 encoded string of the raw dump of the png of the user icon
+
+when a new user logs on to the server, ocean-bot notifies all currently logged on users with the following message
+```
+"user-manager": {
+	"new-user": {
+		"real-name": "real-name"
+		"user-icon": <payload>}
+}
+```
+and the ocean-client plugin then updates its cache of users.
 
 ####pm-logger
 plugin to keep an encrypted copy of all personal messages in a database on ocean-bot.
@@ -227,7 +242,8 @@ To register a tab completion, a plugin must provide an input string, output stri
 Imagine Slack's UI, but exactly the same.
 
 ##Development Priorities
-ordered list of features that are most important to least important
+
+some things are more critical than others, some things depend on others.
 
 ###Backend:
 1. communication between ocean-client and ocean-bot over irc
