@@ -81,6 +81,8 @@ the events are as follows:
 ###Load Order
 because of interdependence between plugins, loading order matters. All local plugins are loaded before Client-Server plugins. Within those categorizations, plugins use the `priority` attribute defined in their `plugin-name.json` file.
 
+###Local Plugins
+Local plugins are plugins that do not have a server sided component. They only have event hooks. Only called plugins because they are dynamically loaded from the `local-plugin` directory
 
 ###Client-Server Plugins 
 client-server plugins are python modules loaded dynamically from the `client-server-plugin` directory. They are composed of 2 components: a clientside and serverside plugin. All comminication between ocean-bot and ocean-client is in the form of JSON formatted strings, prepended with the name of the plugin it is intended for, i.e. `"plugin-name": {...}`
@@ -92,8 +94,13 @@ each plugin must implement the following methods:
 
 also, in the plugin folder, there must be a json file called `plugin-name.json` (where plugin-name is the name of the .py folder defining the plugin)
 
-a description of each of the core child plugins is provided below.
+##Core Plugins
 
+####link-expand (local only)
+expands images, webms and youtube videos linked in chat (client side only)
+
+####tab-completion (local only)
+handles the tab completion engine and dialog (client side only).
 
 ####init
 the init plugin is responsible for managing the initialization of other plugins on the client. it cannot be disabled or uninstalled
@@ -197,7 +204,7 @@ Its `parse-init-params` takes the output of `generate-init-params`, and returns 
 }
 ```
 
-where `<payload>` is a base-64 encoded string of the raw dump of the png of the user icon
+where `<payload>` is a base-64 encoded string of the png of the user icon
 
 when a new user logs on to the server, ocean-bot notifies all currently logged on users with the following message
 ```
@@ -225,15 +232,6 @@ Every time a private message is sent/received, the following is dm'd to ocean-bo
 }
 ```
 
-###Local Plugins
-Local plugins are plugins that do not have a server sided component. They only have event hooks. Only called plugins because they are dynamically loaded from the `local-plugin` directory
-
-####link-expand
-expands images, webms and youtube videos linked in chat
-
-####tab-completion
-handles the tab completion engine.
-
 hooked into the `keystroke` event. If a `:` is typed or a `/` is typed at the beginning of a line, it opens an autocomplete dialog, the contents of which are pulled from one of two separate lists that tab-completion allows other plugins to register for with the `register` method.
 
 To register a tab completion, a plugin must provide an input string, output string, and list that the completion should go into.
@@ -243,7 +241,7 @@ Imagine Slack's UI, but exactly the same.
 
 ##Development Priorities
 
-some things are more critical than others, some things depend on others.
+some features are more critical than others, some features depend on others.
 
 ###Backend:
 1. communication between ocean-client and ocean-bot over irc
