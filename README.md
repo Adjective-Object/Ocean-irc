@@ -86,6 +86,9 @@ each plugin must implement the following methods:
 `parse-init-params`: parses the output of `generate-init-params` and returns an appropriate json string for updating/initializing the client-side plugin
 `initialize`: takes the output of `parse-init-params` and initializes the client-side plugin from it
 
+`generate-init-params` produces 2 fields: 
+1. version, a version number for the plugin 2. cache-updated, a timestamp of the last time the cache was updated for this server
+
 also, in the plugin folder, there must be a json file called `plugin-name.json` (where plugin-name is the name of the .py folder defining the plugin)
 
 ###Local Plugins
