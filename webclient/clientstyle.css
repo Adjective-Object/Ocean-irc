@@ -1,0 +1,16 @@
+@font-face {
+  font-family: Lato;
+  font-weight: 400;
+  src: url(./Lato-Regular.ttf); }
+@font-face {
+  font-family: Lato;
+  font-weight: 200;
+  src: url(./Lato-Light.ttf); }
+@font-face {
+  font-family: Lato;
+  font-weight: 100;
+  src: url(./Lato-Hairline.ttf); }
+#sidebar {
+  font-family: Lato; }
+
+/*# sourceMappingURL=clientstyle.css.map */
