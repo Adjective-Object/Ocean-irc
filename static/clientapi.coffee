@@ -2,6 +2,7 @@
 ENTER = 13;
 TAB = 9
 ESC = 27
+BACKTICK = 192
 
 UP = 38
 DOWN = 40
@@ -44,7 +45,7 @@ sendMessage = (str) ->
 
 shiftSidebarFocus = (index) ->
 	sideBarFocus = (numChannels + sideBarFocus + index) % numChannels
-	$("#sidebar a:nth-of-type("+sideBarFocus+")").focus()
+	$("#sidebar a:nth-of-type("+(sideBarFocus+1)+")").focus()
 
 
 # On Document Ready
@@ -54,10 +55,10 @@ $(document).ready ->
 	#keypresses that make it to the top level
 	$(document).keydown (e) -> 
 		switch e.keyCode
-			when TAB
+			when BACKTICK
 				$("body").toggleClass("sidebarhidden");
 			when ENTER #ENTER
-				typingArea.focus();
+				typingArea.focu1s();
 			else
 				console.log("uk body", e.keyCode);
 
@@ -65,10 +66,13 @@ $(document).ready ->
 	typingArea.keydown (e)->
 		e.stopPropagation();
 		switch e.keyCode
+			when BACKTICK
+				$("body").toggleClass("sidebarhidden");
+				shiftSidebarFocus(0);
 			when TAB  #TAB
 				e.preventDefault();
 				$("body").removeClass("sidebarhidden");
-				sideBar.focus();
+				shiftSidebarFocus(0);
 				console.log("tab")
 			when ENTER #ENTER
 				e.preventDefault();
@@ -78,7 +82,7 @@ $(document).ready ->
 				console.log("esc");
 				#switch focus from text bar to the sidebar
 				$("body").removeClass("sidebarhidden");
-				sideBar.focus();
+				shiftSidebarFocus(0)
 			else
 				console.log("uk textbox", e.keyCode);
 
@@ -88,13 +92,16 @@ $(document).ready ->
 		e.stopPropagation();
 		e.preventDefault
 		switch e.keyCode
+			when TAB
+				e.preventDefault();
+				shiftSidebarFocus(1);
 			when ENTER
 				#TODO loading the right pane
-				sideBar.focus()
+				sideBar.focus();
 			when UP, K
-				shiftSidebarFocus(-1)
-			when DOWN, J, TAB
-				shiftSidebarFocus(1)
+				shiftSidebarFocus(-1);
+			when DOWN, J
+				shiftSidebarFocus(1);
 			else
 				console.log("uk inputbox", e.keyCode);
 
