@@ -1,7 +1,23 @@
-typingArea = $("textarea")
+#keycode defs
+ENTER = 13;
+TAB = 9
+ESC = 27
 
-autocompletes = []
-users = []
+UP = 38
+DOWN = 40
+J = 74
+K = 75
+
+#special elems of the text
+typingArea = $("textarea");
+sideBar = $("#sidebar");
+sideBarFocus = 0;
+numChannels = $("#sidebar a").length
+
+#data pulled fro, the server
+autocompletes = [];
+users = [];
+
 
 loadUsers = ->
 	$.ajax "./api/userlist",
@@ -26,38 +42,61 @@ loadAutoCompletes = ->
 sendMessage = (str) ->
 	return
 
+shiftSidebarFocus = (index) ->
+	sideBarFocus = (numChannels + sideBarFocus + index) % numChannels
+	$("#sidebar a:nth-of-type("+sideBarFocus+")").focus()
+
+
 # On Document Ready
 $(document).ready ->
 	typingArea.autosize();
 
 	#keypresses that make it to the top level
-	$(document).keypress (e) -> 
+	$(document).keydown (e) -> 
 		switch e.keyCode
-			when 9, 67, 99  #TAB or C or c
+			when TAB
 				$("body").toggleClass("sidebarhidden");
-			when 13 #ENTER
+			when ENTER #ENTER
 				typingArea.focus();
 			else
-				console.log("unknown keycode", e.keyCode);
+				console.log("uk body", e.keyCode);
 
 	#keypresses on the input box
-	$("#inputbox").keypress (e)->
+	typingArea.keydown (e)->
 		e.stopPropagation();
 		switch e.keyCode
-			when 9  #TAB
-				$("body").toggleClass("sidebarhidden");
+			when TAB  #TAB
+				e.preventDefault();
+				$("body").removeClass("sidebarhidden");
+				sideBar.focus();
 				console.log("tab")
-			when 13 #ENTER
+			when ENTER #ENTER
 				e.preventDefault();
 				sendMessage(typingArea.text);
 				$(typingArea).val("");
-			when 27 #ESC
+			when ESC #ESC
 				console.log("esc");
 				#switch focus from text bar to the sidebar
 				$("body").removeClass("sidebarhidden");
-				$("#sidebar").focus();
+				sideBar.focus();
 			else
-				console.log(e.keyCode)
+				console.log("uk textbox", e.keyCode);
+
+
+	#navigating in the sidebar
+	sideBar.keydown (e) -> 
+		e.stopPropagation();
+		e.preventDefault
+		switch e.keyCode
+			when ENTER
+				#TODO loading the right pane
+				sideBar.focus()
+			when UP, K
+				shiftSidebarFocus(-1)
+			when DOWN, J, TAB
+				shiftSidebarFocus(1)
+			else
+				console.log("uk inputbox", e.keyCode);
 
 	#sending a "connect to server" message on connect
 	$.ajax "./api/connect/104.236.63.94/oceanman/", 

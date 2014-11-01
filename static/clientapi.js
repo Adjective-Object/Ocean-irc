@@ -1,7 +1,27 @@
 (function() {
-  var autocompletes, loadAutoCompletes, loadUsers, sendMessage, typingArea, users;
+  var DOWN, ENTER, ESC, J, K, TAB, UP, autocompletes, loadAutoCompletes, loadUsers, numChannels, sendMessage, shiftSidebarFocus, sideBar, sideBarFocus, typingArea, users;
+
+  ENTER = 13;
+
+  TAB = 9;
+
+  ESC = 27;
+
+  UP = 38;
+
+  DOWN = 40;
+
+  J = 74;
+
+  K = 75;
 
   typingArea = $("textarea");
+
+  sideBar = $("#sidebar");
+
+  sideBarFocus = 0;
+
+  numChannels = $("#sidebar a").length;
 
   autocompletes = [];
 
@@ -37,36 +57,58 @@
 
   sendMessage = function(str) {};
 
+  shiftSidebarFocus = function(index) {
+    sideBarFocus = (numChannels + sideBarFocus + index) % numChannels;
+    return $("#sidebar a:nth-of-type(" + sideBarFocus + ")").focus();
+  };
+
   $(document).ready(function() {
     typingArea.autosize();
-    $(document).keypress(function(e) {
+    $(document).keydown(function(e) {
       switch (e.keyCode) {
-        case 9:
-        case 67:
-        case 99:
+        case TAB:
           return $("body").toggleClass("sidebarhidden");
-        case 13:
+        case ENTER:
           return typingArea.focus();
         default:
-          return console.log("unknown keycode", e.keyCode);
+          return console.log("uk body", e.keyCode);
       }
     });
-    $("#inputbox").keypress(function(e) {
+    typingArea.keydown(function(e) {
       e.stopPropagation();
       switch (e.keyCode) {
-        case 9:
-          $("body").toggleClass("sidebarhidden");
+        case TAB:
+          e.preventDefault();
+          $("body").removeClass("sidebarhidden");
+          sideBar.focus();
           return console.log("tab");
-        case 13:
+        case ENTER:
           e.preventDefault();
           sendMessage(typingArea.text);
           return $(typingArea).val("");
-        case 27:
+        case ESC:
           console.log("esc");
           $("body").removeClass("sidebarhidden");
-          return $("#sidebar").focus();
+          return sideBar.focus();
         default:
-          return console.log(e.keyCode);
+          return console.log("uk textbox", e.keyCode);
+      }
+    });
+    sideBar.keydown(function(e) {
+      e.stopPropagation();
+      e.preventDefault;
+      switch (e.keyCode) {
+        case ENTER:
+          return sideBar.focus();
+        case UP:
+        case K:
+          return shiftSidebarFocus(-1);
+        case DOWN:
+        case J:
+        case TAB:
+          return shiftSidebarFocus(1);
+        default:
+          return console.log("uk inputbox", e.keyCode);
       }
     });
     return $.ajax("./api/connect/104.236.63.94/oceanman/", {
