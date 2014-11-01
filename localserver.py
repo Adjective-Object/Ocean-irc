@@ -1,12 +1,11 @@
 from flask import Flask
 from ocean import *
 import unicodedata
+import json
 app = Flask(__name__)
 
-from twisted.internet import reactor, protocol, ssl
-
 connected = False
-
+client = OceanClient()
 
 def send_static_file(path):
     f = open(path, "r")
@@ -28,34 +27,70 @@ def rootRoute():
 @app.route("/api/connect/<hostname>/<nick>/<int:port>")
 @app.route("/api/connect/<hostname>/<nick>/")
 def handleConnect(hostname, nick, port=6667):
+    """
     global connected
     if not connected:
         connected = True
-        factory = OceanClientFactory( nouni(nick) )
-
-        reactor.connectSSL(
-            nouni(hostname), port, 
-            factory, ssl.ClientContextFactory())
-
-        reactor.run()
-
-        return "connecting..."
+        client.connect( nouni(hostname), nouni(nick), port)
+        return "opening connection..."
 
     return "already connected..."
+    """
+    return "not implemented"
 
+
+@app.route("/api/userlist")
+def getUserList():
+    #fake user list
+    return json.dumps(
+        [
+            {   "realname": "PJ Rosa",
+                "nick": "de-mote"
+            },
+            {   "realname": "Jeff Tao",
+                "nick": "jtao"
+            },
+            {   "realname": "Nolan Lum",
+                "nick": "nolm"
+            },
+            {   "realname": "God Damn Billy",
+                "nick": "insectMechanics"
+            },
+            {   "realname": "insectMechanics",
+                "nick": "God Damn Billy"
+            },
+            {   "realname": "PRo Koder",
+                "nick": "PRoKoder"
+            }
+        ])
 
 #handles a character being typed
-@app.route("/api/chartyped/")
-def handletyped():
-    return "unimplemented"
+@app.route("/api/autocompletes")
+def getAutoCompletes():
+    s = json.dumps([
+        {   "open": "/",
+            "close": " ",
+            "completes": {
+                "join": "join"
+            }
+        },
+        {   "open": ":",
+            "close": ":",
+            "completes": {
+                "fuck": u'(\uFF61 \u2256 \u0E34 \u203F \u2256 \u0E34)'
+            }
+        }
+    ])
+    print s
+    return s
 
 #string 
-@app.route("/api/pushString/")
-def pushString():
+@app.route("/api/pushMessage/")
+def pushMessage():
     return "unimplemented"
 
-@app.route("/api/getString/")
-def getString():
+@app.route("/api/getMessages/<timestamp>")
+def getMessages():
     return "unimplemented"
 
 if __name__ == "__main__":
