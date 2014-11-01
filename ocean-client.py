@@ -1,18 +1,5 @@
-from flask import Flask
-app = Flask(__name__)
+class OceanClient(Object):
 
-state=Object()
-state.currentString = ""
+	def __init__():
+		pass
 
-
-@app.route("/char")
-def hello():
-    return "fuck"
-
-@app.route("/")
-def hello():
-    return "fuck"
-
-
-if __name__ == "__main__":
-    app.run()
