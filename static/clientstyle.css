@@ -59,14 +59,14 @@ body, html {
     letter-spacing: 3px;
     border-top-color: #fff;
     border-top-style: solid;
-    border-top-width: 0px;
+    border-top-width: 1px;
     font-size: 10px;
     margin-top: 20px;
     margin-bottom: 20px; }
   #sidebar header:first-child {
     border-top-style: none;
     margin-top: 0px;
-    margin-bottom: 0px;
+    margin-bottom: 10px;
     height: 40px;
     padding-left: 45%;
     background-color: #6db3c9;
@@ -97,6 +97,8 @@ body, html {
     border-color: #fff;
     border-left-width: 7px;
     border-left-style: solid; }
+  #sidebar a:focus {
+    outline: none; }
   #sidebar > header, #sidebar > a {
     width: 200px; }
 
