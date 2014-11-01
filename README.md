@@ -276,7 +276,7 @@ TODO on this doc:
 2. more accurate description of UI
 
 1. [PyQt](https://wiki.python.org/moin/PyQt)
-2. [python irc](https://wiki.python.org/moin/PyQt)
+2. [python irc](https://pypi.python.org/pypi/irc)
 3. [loading python modules dynamically](http://stackoverflow.com/questions/951124/dynamic-loading-of-python-modules)
 
 Also , we're using python3. Deal with it.
