@@ -7,7 +7,6 @@ state.currentString = ""
 
 @app.route("/char")
 def hello():
-
     return "fuck"
 
 @app.route("/")
