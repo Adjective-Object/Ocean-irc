@@ -1,95 +1,109 @@
-import irc.client
-import simplejson
+import threading
+from time import sleep
+
+from twisted.words.protocols import irc
+from twisted.internet import reactor, protocol
+
 
 class Plugin(object):
-	""" A generic interface for client-server plugins
-	"""
-	name = "plugin-default"
-	parameters = []
+    """ A generic interface for client-server plugins
+    """
+    name = "plugin-default"
+    parameters = []
 
 
-	# Initialization
+    # Initialization
 
-	def generateInitParams(self):
-		""" (client side) generates a list of parameters 
-			that report the state of the client 
-		"""
-		pass
+    def generateInitParams(self):
+        """ (client side) generates a list of parameters 
+            that report the state of the client 
+        """
+        pass
 
-	def parseInitParams(self, json):
-		""" (server side) parses down the list of init
-			params from the client and shits out a list
-			of the neccisary data to update the state of
-			the client to the state of the server
-		"""
-		pass
+    def parseInitParams(self, json):
+        """ (server side) parses down the list of init
+            params from the client and shits out a list
+            of the neccisary data to update the state of
+            the client to the state of the server
+        """
+        pass
 
-	def initializeClient(self, json):
-		""" (client side) updates the client from 
-			parseInitParams to be in sync with the server
-		"""
-		pass
+    def initializeClient(self, json):
+        """ (client side) updates the client from 
+            parseInitParams to be in sync with the server
+        """
+        pass
 
 
-	# Updating (we don't care about these for now)
-	# also it's not finished right now
+    # Updating (we don't care about these for now)
+    # also it's not finished right now
 
-	def updateServer(self, json):
-		""" update some parameter in the ser
-		"""
+    def updateServer(self, json):
+        """ update some parameter in the ser
+        """
 
-	def updateClient(self, json):
-		""" (client side) update the client from a change
-			in the server.
-		"""
-		pass
+    def updateClient(self, json):
+        """ (client side) update the client from a change
+            in the server.
+        """
+        pass
 
-class OceanClient(object):
 
-	ircClient = None
-	connection = None
 
-	DISCONNECTED = 0
-	SIMPLE = 1
-	OCEAN = 2
-	mode = DISCONNECTED
 
-	plugins = {}
-	listeners = {}
+class OceanClient(irc.IRCClient):
 
-	def __init__(self):
-		self.ircClient = irc.client.SimpleIRCClient()
+    nickname = ''
+    password = ''
 
-	def addPlugin(self, plugin):
-		plugins[plugin.name] = plugin
+    plugins = {}
+    listeners = {}
 
-	def registerListener(self, pluginName, eventName):
-		if eventName not in listeners.keys:
-			listeners[string] = []
-		listeners[eventName].append(self.plugins[pluginName])
+    def __init__(self, factory):
+        self.factory = factory
+        self.plugins = self.factory.plugins
+        self.nickname = self.factory.nickname
 
-	def connectAndInit(self, server, port, nick):
-		#initialize the connection
-		self.connection = self.ircClient.server()
-		self.connection.connect(server, port, nick)
-		self.connection.process_forever()
+    def connectionMade(self):
+        irc.IRCClient.connectionMade(self)
+        print "connection made"
+ 
+    def connectionLost(self, reason):
+        irc.IRCClient.connectionLost(self, reason)
+        print "connection lost" 
 
-		def proc_initial_who(connection, evt):
-			connection.remove_global_handler("whoreply", proc_initial_who)
-			print(evt);
+    def generateInitParams(self):
+        initParams = {}
+        for key in plugins.keys:
+            json[key] = plugins[key].generateInitParams()
+        return "\"init\": "+initParams
 
-		#attempt to connect to Oceanbot
-		self.connection.join("#general")
-		self.connection.add_global_handler("whoreply", proc_initial_who)
-		self.connection.who("ocean-bot")
 
-	def generateInitParams(self):
-		initParams = {}
-		for key in plugins.keys:
-			json[key] = plugins[key].generateInitParams()
-		return initParams
+class OceanClientFactory(protocol.ClientFactory):
+
+    protocol = OceanClient
+
+    def __init__(self, nick):
+        self.channel = "#general";
+        self.plugins = loadPlugins()
+        self.nickname = nick
+
+    def buildProtocol(self, addr):
+        return OceanClient(self)
+
+    def clientConnectionLost(self, connector, reason):
+        """If we get disconnected, reconnect to server."""
+        print("reconnecting...")
+        connector.connect()
+ 
+    def clientConnectionFailed(self, connector, reason):
+        print("connection failed: %s"%(reason,))
+        reactor.stop()
+
+def loadPlugins():
+    return []
 
 class OceanBot(object):
-	
-	def __init__():
-		pass
+    
+    def __init__():
+        pass

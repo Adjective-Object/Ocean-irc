@@ -1,0 +1,121 @@
+@mixin transition($transition-property, $transition-time, $method) {
+    -webkit-transition: $transition-property $transition-time $method;
+    -moz-transition: $transition-property $transition-time $method;
+    -ms-transition: $transition-property $transition-time $method;
+    -o-transition: $transition-property $transition-time $method;
+    transition: $transition-property $transition-time $method;
+}
+
+@font-face {
+    font-family: Lato;
+    font-weight: 400;
+    src: url(./Lato-Regular.ttf);
+}
+
+@font-face {
+    font-family: Lato;
+    font-weight: 200;
+    src: url(./Lato-Light.ttf);
+}
+
+
+@font-face {
+    font-family: Lato;
+    font-weight: 100;
+    src: url(./Lato-Hairline.ttf);
+}
+
+* {
+    margin:0;
+    padding:0;
+    box-sizing: border-box;
+}
+
+body,html {
+    width: 100%;
+    height: 100%;
+    font-family: Lato;
+}
+
+$sidebar-width: 200px;
+
+#sidebar {
+    position: fixed;
+	width: $sidebar-width;
+    min-height: 100%;
+    float:left;
+
+    background-color: #00A388;
+    color: #EFEFEF;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+    
+    @include transition(width, 0.3s, ease-in-out);
+
+    &:after{
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        box-shadow: inset -28px 0px 17px -20px rgba(0,0,0,0.2);
+        z-index: 5;    
+    }
+
+    header {
+        background-color: #79BD8F;
+        padding: 32px;
+        padding-bottom: 16px;
+        padding-top: 16px;
+        z-index: -1
+    }
+
+    header + a{
+        padding-top: 16px;
+    }
+    a {
+        padding-left: 32px;
+        padding-bottom: 16px;
+
+        text-decoration: none;
+        display: block;
+        color: #CCCCCC;
+    }
+    a.selected{
+        color: #FFFFFF;
+    }
+
+
+
+    &>header, &>a{ width: $sidebar-width;}
+
+}
+
+#textscroll{
+    @include transition(margin-left, 0.3s, ease-in-out);
+
+    margin-left: $sidebar-width;
+    width:auto;
+    min-height: 100%;
+    background-color:red;
+    position:relative;
+
+    textarea{
+        position:absolute;
+        bottom:0px;
+        resize: none;
+        width:100%;
+    }
+}
+
+
+body.sidebarhidden{
+    #sidebar{
+        width: 0;
+    }
+    #textscroll{
+        margin-left:0;
+    }
+}
