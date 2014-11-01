@@ -1,7 +1,7 @@
-import irc
+import irc.client
 import simplejson
 
-class Plugin(Object):
+class Plugin(object):
 	""" A generic interface for client-server plugins
 	"""
 	name = "plugin-default"
@@ -44,31 +44,44 @@ class Plugin(Object):
 		"""
 		pass
 
-class OceanClient(Object):
+class OceanClient(object):
 
 	ircClient = None
 	connection = None
+
+	DISCONNECTED = 0
+	SIMPLE = 1
+	OCEAN = 2
+	mode = DISCONNECTED
 
 	plugins = {}
 	listeners = {}
 
 	def __init__(self):
-		self.ircClient = irc.client.IRC()
+		self.ircClient = irc.client.SimpleIRCClient()
 
 	def addPlugin(self, plugin):
 		plugins[plugin.name] = plugin
 
-
-	def registerListener(self, pluginName, name):
-		if string not in listeners.keys:
+	def registerListener(self, pluginName, eventName):
+		if eventName not in listeners.keys:
 			listeners[string] = []
-
-		listeners[string].append(self.plugins[pluginName])
+		listeners[eventName].append(self.plugins[pluginName])
 
 	def connectAndInit(self, server, port, nick):
+		#initialize the connection
 		self.connection = self.ircClient.server()
-		outgoingMessage = self.generateInitParams();
 		self.connection.connect(server, port, nick)
+		self.connection.process_forever()
+
+		def proc_initial_who(connection, evt):
+			connection.remove_global_handler("whoreply", proc_initial_who)
+			print(evt);
+
+		#attempt to connect to Oceanbot
+		self.connection.join("#general")
+		self.connection.add_global_handler("whoreply", proc_initial_who)
+		self.connection.who("ocean-bot")
 
 	def generateInitParams(self):
 		initParams = {}
@@ -76,7 +89,7 @@ class OceanClient(Object):
 			json[key] = plugins[key].generateInitParams()
 		return initParams
 
-class OceanBot(Object):
+class OceanBot(object):
 	
 	def __init__():
 		pass
