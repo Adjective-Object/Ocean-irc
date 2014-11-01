@@ -140,11 +140,57 @@ def loadPlugins(oceanCli):
     pass
 
 class OceanBot(object):
+    socket = None
+    nickname = 'ocean-bot'
+    # CHANGE THIS
+    channels = ['#general']
+    readbuf = ''
+
+    def __init__(self):
+        self.socket = socket.socket()
+        self.socket.connect(('104.236.63.94', 6667))
+        self.send('NICK %s' % self.nickname)
+        self.send('USER %s %s * :%s' % ('ocean-bot', '0', self.nickname))
+        self.send('JOIN %s' % self.channels[0])
     
-    def __init__():
-        pass
+    def get_sender(self, line):
+        return line[0][1:line[0].find('!')]
+
+    def get_recipient(self, line):
+        return line[2]
+
+    def send_message(self, to, msg):
+        self.send('PRIVMSG %s :%s' % (to, msg))
+
+    def send(self, msg):
+        self.socket.send(msg + '\r\n')
+
+    def run(self):
+        self.readbuf = self.readbuf + self.socket.recv(1024).decode('UTF-8')
+        lines = self.readbuf.split('\n')
+        self.readbuf = lines.pop()
+
+        for line in lines:
+            print line
+            line = line.rstrip()
+            # Only spaces characters constitute whitespace
+            line = line.split(' ')
+
+
+            if line[0] == 'PING':
+                self.send('PONG %s\r\n' % line[1])       
+
+            # Channel/Private Messages
+            if line[1] == 'PRIVMSG':
+                if '#' in line[2]:
+                    self.send_message(self.get_recipient(line), 'YOU SAID A THING')
+                if line[2] == self.nickname:
+                    self.send_message(self.get_sender(line), 'hello yes i am ocean bot good day')
 
 if __name__ == "__main__":
-    cli = OceanClient()
-    cli.register("oceanman", "Max HH", nick="oceanman")
-    cli.connect("104.236.63.94")
+    #cli = OceanClient()
+    #cli.register("oceanman", "Max HH", nick="oceanman")
+    #cli.connect("104.236.63.94")
+    bot = OceanBot()
+    while True:
+        bot.run()
