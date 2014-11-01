@@ -56,12 +56,10 @@ class OceanClient(Object):
 	def addPlugin(self, plugin):
 		plugins[plugin.name] = plugin
 
-
-	def registerListener(self, pluginName, name):
-		if string not in listeners.keys:
+	def registerListener(self, pluginName, eventName):
+		if eventName not in listeners.keys:
 			listeners[string] = []
-
-		listeners[string].append(self.plugins[pluginName])
+		listeners[eventName].append(self.plugins[pluginName])
 
 	def connectAndInit(self, server, port, nick):
 		self.connection = self.ircClient.server()
