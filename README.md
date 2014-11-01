@@ -80,18 +80,20 @@ the events are as follows:
 ###Load Order
 because of interdependence between plugins, loading order matters. All local plugins are loaded before Client-Server plugins. Within those categorizations, plugins use the `priority` attribute defined in their `plugin-name.json` file.
 
-###Local Plugins
-Local plugins are plugins that do not have a server sided component. They only have event hooks. Only called plugins because they are dynamically loaded from the `local-plugin` directory
-
-###Client-Server Plugins 
-client-server plugins are python modules loaded dynamically from the `client-server-plugin` directory. They are composed of 2 components: a clientside and serverside plugin. All comminication between ocean-bot and ocean-client is in the form of JSON formatted strings, prepended with the name of the plugin it is intended for, i.e. `"plugin-name": {...}`
-
+###Rules for every Plugin
 each plugin must implement the following methods:
 `generate-init-params`: creates a json string to pass to the server on connect
 `parse-init-params`: parses the output of `generate-init-params` and returns an appropriate json string for updating/initializing the client-side plugin
 `initialize`: takes the output of `parse-init-params` and initializes the client-side plugin from it
 
 also, in the plugin folder, there must be a json file called `plugin-name.json` (where plugin-name is the name of the .py folder defining the plugin)
+
+###Local Plugins
+Local plugins are plugins that do not have a server sided component. They only have event hooks. Only called plugins because they are dynamically loaded from the `local-plugin` directory
+
+###Client-Server Plugins 
+client-server plugins are python modules loaded dynamically from the `client-server-plugin` directory. They are composed of 2 components: a clientside and serverside plugin. All comminication between ocean-bot and ocean-client is in the form of JSON formatted strings, prepended with the name of the plugin it is intended for, i.e. `"plugin-name": {...}
+`
 
 ##Core Plugins
 
