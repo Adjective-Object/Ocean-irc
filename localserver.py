@@ -3,10 +3,8 @@ from ocean import *
 import unicodedata
 app = Flask(__name__)
 
-from twisted.internet import reactor, protocol, ssl
-
 connected = False
-
+client = OceanClient()
 
 def send_static_file(path):
     f = open(path, "r")
@@ -30,16 +28,9 @@ def rootRoute():
 def handleConnect(hostname, nick, port=6667):
     global connected
     if not connected:
-        connected = True
-        factory = OceanClientFactory( nouni(nick) )
-
-        reactor.connectSSL(
-            nouni(hostname), port, 
-            factory, ssl.ClientContextFactory())
-
-        reactor.run()
-
-        return "connecting..."
+        #connected = True
+        client.connect( nouni(hostname), nouni(nick), port)
+        return "opening connection..."
 
     return "already connected..."
 
