@@ -1,7 +1,41 @@
 (function() {
-  var typingArea;
+  var autocompletes, loadAutoCompletes, loadUsers, sendMessage, typingArea, users;
 
   typingArea = $("textarea");
+
+  autocompletes = [];
+
+  users = [];
+
+  loadUsers = function() {
+    return $.ajax("./api/userlist", {
+      type: "GET",
+      dataType: "json",
+      error: function(jqXHR, textStatus, errorThrown) {
+        return console.log("error in getting userlist: ", textStatus);
+      },
+      success: function(data, textStatus, jqXHR) {
+        this.users = data;
+        return console.log(this.users);
+      }
+    });
+  };
+
+  loadAutoCompletes = function() {
+    return $.ajax("./api/autocompletes", {
+      type: "GET",
+      dataType: "json",
+      error: function(jqXHR, textStatus, errorThrown) {
+        return console.log("error in getting autocompletes: ", textStatus);
+      },
+      success: function(data, textStatus, jqXHR) {
+        this.autocompletes = data;
+        return console.log(this.autocompletes);
+      }
+    });
+  };
+
+  sendMessage = function(str) {};
 
   $(document).ready(function() {
     typingArea.autosize();
@@ -12,18 +46,27 @@
         case 99:
           return $("body").toggleClass("sidebarhidden");
         case 13:
-          e.preventDefault();
-          e.stopPropagation();
-          if (typingArea.is(":focus")) {
-            console.log("...");
-            sendMessage(typingArea.text);
-            return typingArea.text = "";
-          } else {
-            return typingArea.focus();
-          }
-          break;
+          return typingArea.focus();
         default:
           return console.log("unknown keycode", e.keyCode);
+      }
+    });
+    $("#inputbox").keypress(function(e) {
+      e.stopPropagation();
+      switch (e.keyCode) {
+        case 9:
+          $("body").toggleClass("sidebarhidden");
+          return console.log("tab");
+        case 13:
+          e.preventDefault();
+          sendMessage(typingArea.text);
+          return $(typingArea).val("");
+        case 27:
+          console.log("esc");
+          $("body").removeClass("sidebarhidden");
+          return $("#sidebar").focus();
+        default:
+          return console.log(e.keyCode);
       }
     });
     return $.ajax("./api/connect/104.236.63.94/oceanman/", {
@@ -33,14 +76,10 @@
         return console.log(textStatus);
       },
       success: function(data, textStatus, jqXHR) {
-        return console.log(data);
+        console.log(data);
+        loadUsers();
+        return loadAutoCompletes();
       }
-    });
-  });
-
-  sendMessage(function(str) {
-    return $.get(function() {
-      return "./api/connect/";
     });
   });
 

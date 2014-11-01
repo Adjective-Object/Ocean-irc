@@ -7,7 +7,7 @@ class Plugin(object):
     name = "plugin-default"
     parameters = []
     version = 0
-    cache-updated = 0
+    cache_updated = 0
 
     # Initialization
     def generateInitParams(self):
