@@ -5,6 +5,8 @@ class Plugin(Object):
 	""" A generic interface for client-server plugins
 	"""
 	name = "plugin-default"
+	parameters = []
+
 
 	# Initialization
 
