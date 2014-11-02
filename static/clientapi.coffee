@@ -36,7 +36,7 @@ setActiveChannel = (chan) ->
 
     $("#topic").text("##{chan} :: " + channels["##{chan}"]["topic"]);
     $("#chatcontents").empty();
-    #console.log(chan, messages);
+    console.log(chan, messages);
     populateChatBuffer(messages["##{chan}"]);
     
     $("#sidebar a[href='##{chan}']").removeAttr("data-notif");
@@ -67,13 +67,13 @@ joinChannel = (channame) ->
 
             messages["##{channame}"] = [];
             channels["##{channame}"] = data;
-            console.log(channels);
+            #console.log(channels);
 
-            console.log(window.location.hash, "##{channame}");
+            #console.log(window.location.hash, "##{channame}");
             if (window.location.hash == "##{channame}")
-                console.log("ACTIV!!");
+                #console.log("ACTIV!!");
                 setActiveChannel(channame)
-            else if (window.location.hash = undefined && initChans.indexOf(channame) == 0 )
+            else if (window.location.hash == undefined && initChans.indexOf(channame) == 0 )
                 setActiveChannel(channame)
             
 
@@ -91,6 +91,12 @@ buildMsg = (msg) ->
     obj = $(".body",n)
     obj.text(msg['msg']).html();
     obj.html(obj.html().replace(/\n/g,'<br/>'));
+
+    # console.log(">>"c.attr("sender"), $(n).attr("sender"))
+
+    if($(c).last().attr("sender") == $(n).attr("sender"))
+        console.log("collapsing post");
+        $(n).addClass("collapsed");
     c.append(n);
     if scroll
         c.scrollTop(c.get(0).scrollHeight)
@@ -102,7 +108,7 @@ fetchMessages = ->
         error: (jqXHR, textStatus, errorThrown) ->
             console.log("error in getting messages: ", errorThrown)
         success: (data, textStatus, jqXHR) ->
-            console.log(data);
+            #console.log(data);
             for msg in data
                 messages[msg["channel"]].push(msg)
                 if (msg["channel"].substring(1) == activeChannel)
