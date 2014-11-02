@@ -1,5 +1,6 @@
 import socket, sys
 import threading
+import time
 
 class Plugin(object):
     """ A generic interface for client-server plugins
@@ -61,6 +62,9 @@ class OceanClient():
     channels = {}
     readbuf = ''
 
+    # for web client
+    outbuf = []
+
     # CODE COPIED FROM OCEANBOT
     def __init__(self):
         loadPlugins(self)
@@ -105,10 +109,7 @@ class OceanClient():
             self.send("NICK %s" % self.nick)
         self.send("USER %s 0 * :%s" % (self.username,self.realname))
         self.send("JOIN #general")
-
-        #self.send("")
         self.send("WHOIS ocean-bot")
-        #self.flushToNumeric(311)
 
     def send_command(self, command, args):
         if command == 'JOIN':
@@ -116,7 +117,7 @@ class OceanClient():
         elif command == 'NAMES':
             self.send('NAMES %s' % args)
         else:
-            #Blindly sends /COMMAND ARGS as COMMAND ARGS
+            # Blindly sends /COMMAND ARGS as COMMAND ARGS
             self.send('%s %s' % (command, args))
 
     def read_send_loop(self):
@@ -128,6 +129,14 @@ class OceanClient():
                 self.send_command(line[0][1:], line[1])
             else:
                 self.send_message(line[0], line[1])
+            print self.read_outbuf()
+            self.clear_outbuf()
+
+    def read_outbuf(self):
+        return self.outbuf
+
+    def clear_outbuf(self):
+        self.outbuf = {}
 
     def run(self):
         input_thread = threading.Thread(target=self.read_send_loop)
@@ -144,21 +153,29 @@ class OceanClient():
                 if line[0] == 'PING':
                     self.send('PONG %s\r\n' % line[1])       
 
-                # Channel/Private Messages
                 elif line[1] == 'PRIVMSG':
-                    cli_print(line)
+                    # cli_print(line) #FOR DEBUG/CLI
+                    # Channel Messages
                     if '#' in line[2]:
-                        self.send_message(self.get_recipient(line),
-                                'YOU SAID A THING')
+                        self.outbuf.append({
+                            u'channel': self.get_recipient(line),
+                            u'sender':  self.get_sender(line),
+                            u'message': ' '.join(line[3:]).strip(),
+                            u'timestamp': str(time.time()).encode('UTF-8')
+                        })
+                    # Private Messages
                     if line[2] == self.nickname:
-                        self.send_message(self.get_sender(line),
-                                'hello yes i am ocean client good day')
+                        self.outbuf.append({
+                            u'channel': self.get_sender(line),
+                            u'sender':  self.get_sender(line),
+                            u'message': ' '.join(line[3:]).strip(),
+                            u'timestamp': str(time.time()).encode('UTF-8')
+                        })
 
                 # Numeric Messages
                 elif line[1].isdigit():
                     if line[1] == '401' and line[3] == 'ocean-bot':
                         self.simple_mode = True
-                        print 'Entering simple mode...'
                     elif line[1] == '311' and line[3] == 'ocean-bot':
                         self.bot_init_plugins()
                     elif line[1] == '353':
@@ -166,13 +183,15 @@ class OceanClient():
                             nick.replace(':', '').strip()
                             for nick in line[5:]]
                     else:
-                        print ' '.join(line)
+                        #print ' '.join(line)
+                        pass
                 else:
-                    print ' '.join(line)
+                    #print ' '.join(line)
+                    pass
 
 def cli_print(line):
     sender = line[0][1:line[0].find('!')]
-    print "[%s] %s%s" % (line[2],sender, ' '.join(line[3:]))
+    print "[%s] %s%s" % (line[2], sender, ' '.join(line[3:]))
 
 def loadPlugins(oceanCli):
     #oceanCli.plugins
