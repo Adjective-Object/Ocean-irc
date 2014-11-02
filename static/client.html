@@ -7,21 +7,27 @@
 </head>
 <body>
 <nav id="sidebar">
-	<header><img style="width: 30px; margin-bottom: -5px; padding-right: 4px; margin-left: 15px;" src="./static/chat_buble-03.svg">Chats</header>
-	<a href="#general">#general</a>
-	<a href="#mabois">#mabois</a>
-	<a href="#turds">#turds</a>
-	<a href="#knurds">#knurds</a>
-	<header><img style="width: 30px; margin-bottom: -5px; margin-top:10px; margin-left: -15px;" src="./static/priv_mes-04.svg">Private Channels</header>
-	<a href="#spoopy">#spoopy</a>
-	<a href="#secret">#secret</a>
-	<header>DMs</header>
-	<a href="#@user">user</a>
-	<a href="#@another">another</a>
+	<header id="publicChannels">
+		<img style="width: 30px; margin-bottom: -5px; padding-right: 4px; margin-left: 15px;" src="./static/chat_buble-03.svg">Chats
+	</header>
+	
+	<header id="privateChannels">
+		<img style="width: 30px; margin-bottom: -5px; margin-top:10px; margin-left: -15px;" src="./static/priv_mes-04.svg">Private Channels
+	</header>
 </nav>
 
 <section id="textscroll">
-	ugh
+
+	<section id="chatcontents">
+	<section class="post">
+		<img src="./static/imgdump/placeholder.jpg"/>
+		<section class="name">userName</section>
+		<section class="post">
+			THIS IS NOT MADE OF DIVS
+		</section>
+	</section>
+	</section>
+
 	<section id="in">
 	<textarea id="inputbox"></textarea>
 	</section>
@@ -31,4 +37,5 @@
 <script type="text/javascript" src="./static/jquery-2.1.1.js"></script>
 <script type="text/javascript" src="./static/jquery.autosize.js"></script>
 <script type="text/javascript" src="./static/clientapi.js"></script>
+<script type="text/javascript" src="./static/localbehavior.js"></script>
 </html>

@@ -1,21 +1,5 @@
 (function() {
-  var BACKTICK, DOWN, ENTER, ESC, J, K, TAB, UP, autocompletes, loadAutoCompletes, loadUsers, numChannels, sendMessage, shiftSidebarFocus, sideBar, sideBarFocus, typingArea, users;
-
-  ENTER = 13;
-
-  TAB = 9;
-
-  ESC = 27;
-
-  BACKTICK = 192;
-
-  UP = 38;
-
-  DOWN = 40;
-
-  J = 74;
-
-  K = 75;
+  var autocompletes, channels, initChans, initialJoin, joinChannel, loadAutoCompletes, numChannels, sideBar, sideBarFocus, typingArea, users;
 
   typingArea = $("textarea");
 
@@ -25,16 +9,68 @@
 
   numChannels = $("#sidebar a").length;
 
+  initChans = ["general", "mabois", "knurds"];
+
   autocompletes = [];
 
   users = [];
 
-  loadUsers = function() {
-    return $.ajax("./api/userlist", {
+  channels = [];
+
+  window.ircapi_sendMessage = function(str) {};
+
+  $("#sidebar a").click(function(evt) {
+    var channel;
+    evt.preventDefault();
+    channel = this.hash.substring(1);
+    window.location.hash = this.hash;
+    $(".ticked").removeClasss(".ticked");
+    return this.addClass(".ticked");
+  });
+
+  joinChannel = function(channame) {
+    return $.ajax("./api/join/" + channame + "/", {
       type: "GET",
       dataType: "json",
       error: function(jqXHR, textStatus, errorThrown) {
-        return console.log("error in getting userlist: ", textStatus);
+        return console.log("error in getting userlist: ", errorThrown);
+      },
+      success: function(data, textStatus, jqXHR) {
+        $("#sidebar #publicChannels").after($("<a href=\"#" + channame + "\">#" + channame + "</a>"));
+        return users.push(data);
+      }
+    });
+  };
+
+  $(document).ready(function() {
+    return $.ajax("./api/connect/104.236.63.94/oceanman/", {
+      type: "GET",
+      dataType: "html",
+      error: function(jqXHR, textStatus, errorThrown) {
+        return console.log(textStatus);
+      },
+      success: function(data, textStatus, jqXHR) {
+        var c, channel, _i, _len, _ref;
+        console.log(data);
+        loadAutoCompletes();
+        _ref = initChans.reverse();
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          c = _ref[_i];
+          joinChannel(c);
+        }
+        return channel = channels[0];
+      }
+    });
+  });
+
+  initialJoin = function() {
+    console.log("./api/userlist/" + channel + "/");
+    joinChannel();
+    return $.ajax("./api/join/" + channel + "/", {
+      type: "GET",
+      dataType: "json",
+      error: function(jqXHR, textStatus, errorThrown) {
+        return console.log("error in getting userlist: ", errorThrown);
       },
       success: function(data, textStatus, jqXHR) {
         this.users = data;
@@ -48,7 +84,7 @@
       type: "GET",
       dataType: "json",
       error: function(jqXHR, textStatus, errorThrown) {
-        return console.log("error in getting autocompletes: ", textStatus);
+        return console.log("error in getting autocompletes: ", errorThrown);
       },
       success: function(data, textStatus, jqXHR) {
         this.autocompletes = data;
@@ -56,80 +92,5 @@
       }
     });
   };
-
-  sendMessage = function(str) {};
-
-  shiftSidebarFocus = function(index) {
-    sideBarFocus = (numChannels + sideBarFocus + index) % numChannels;
-    return $("#sidebar a:nth-of-type(" + (sideBarFocus + 1) + ")").focus();
-  };
-
-  $(document).ready(function() {
-    typingArea.autosize();
-    $(document).keydown(function(e) {
-      switch (e.keyCode) {
-        case BACKTICK:
-          return $("body").toggleClass("sidebarhidden");
-        case ENTER:
-          return typingArea.focu1s();
-        default:
-          return console.log("uk body", e.keyCode);
-      }
-    });
-    typingArea.keydown(function(e) {
-      e.stopPropagation();
-      switch (e.keyCode) {
-        case BACKTICK:
-          $("body").toggleClass("sidebarhidden");
-          return shiftSidebarFocus(0);
-        case TAB:
-          e.preventDefault();
-          $("body").removeClass("sidebarhidden");
-          shiftSidebarFocus(0);
-          return console.log("tab");
-        case ENTER:
-          e.preventDefault();
-          sendMessage(typingArea.text);
-          return $(typingArea).val("");
-        case ESC:
-          console.log("esc");
-          $("body").removeClass("sidebarhidden");
-          return shiftSidebarFocus(0);
-        default:
-          return console.log("uk textbox", e.keyCode);
-      }
-    });
-    sideBar.keydown(function(e) {
-      e.stopPropagation();
-      e.preventDefault;
-      switch (e.keyCode) {
-        case TAB:
-          e.preventDefault();
-          return shiftSidebarFocus(1);
-        case ENTER:
-          return sideBar.focus();
-        case UP:
-        case K:
-          return shiftSidebarFocus(-1);
-        case DOWN:
-        case J:
-          return shiftSidebarFocus(1);
-        default:
-          return console.log("uk inputbox", e.keyCode);
-      }
-    });
-    return $.ajax("./api/connect/104.236.63.94/oceanman/", {
-      type: "GET",
-      dataType: "html",
-      error: function(jqXHR, textStatus, errorThrown) {
-        return console.log(textStatus);
-      },
-      success: function(data, textStatus, jqXHR) {
-        console.log(data);
-        loadUsers();
-        return loadAutoCompletes();
-      }
-    });
-  });
 
 }).call(this);

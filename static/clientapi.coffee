@@ -1,31 +1,64 @@
-#keycode defs
-ENTER = 13;
-TAB = 9
-ESC = 27
-BACKTICK = 192
-
-UP = 38
-DOWN = 40
-J = 74
-K = 75
-
 #special elems of the text
 typingArea = $("textarea");
 sideBar = $("#sidebar");
 sideBarFocus = 0;
 numChannels = $("#sidebar a").length
 
-#data pulled fro, the server
+#init args
+initChans = ["general", "mabois", "knurds"]
+
+#data pulled from the server
 autocompletes = [];
 users = [];
+channels = [];
+
+window.ircapi_sendMessage = (str) ->
+	return
+
+$("#sidebar a").click (evt) ->
+	evt.preventDefault()
+	channel = this.hash.substring(1);
+
+	window.location.hash = this.hash;
+	$(".ticked").removeClasss(".ticked");
+	this.addClass(".ticked");
+	
+joinChannel = (channame) ->
+	$.ajax ("./api/join/"+channame+"/"),
+	type: "GET"
+	dataType: "json"
+	error: (jqXHR, textStatus, errorThrown) ->
+		console.log("error in getting userlist: ", errorThrown)
+	success: (data, textStatus, jqXHR) ->
+		$("#sidebar #publicChannels").after(
+			$("<a href=\"##{channame}\">##{channame}</a>")
+		);
+		users.push(data)
+
+# On Document Ready
+$(document).ready ->
+	#sending a "connect to server" message on connect
+	$.ajax "./api/connect/104.236.63.94/oceanman/", 
+		type: "GET"
+		dataType: "html"
+		error: (jqXHR, textStatus, errorThrown) ->
+        	console.log(textStatus);
+		success: (data, textStatus, jqXHR) ->
+			console.log(data);
+			#load users and autocompletes when connected
+			loadAutoCompletes();
+			(joinChannel(c) for c in initChans.reverse())
+			channel = channels[0]
 
 
-loadUsers = ->
-	$.ajax "./api/userlist",
+initialJoin = ->
+	console.log("./api/userlist/"+channel+"/");
+	joinChannel()
+	$.ajax ("./api/join/"+channel+"/"),
 		type: "GET"
 		dataType: "json"
 		error: (jqXHR, textStatus, errorThrown) ->
-			console.log("error in getting userlist: ", textStatus)
+			console.log("error in getting userlist: ", errorThrown)
 		success: (data, textStatus, jqXHR) ->
 			this.users = data
 			console.log(this.users)
@@ -35,83 +68,7 @@ loadAutoCompletes = ->
 		type: "GET"
 		dataType: "json"
 		error: (jqXHR, textStatus, errorThrown) ->
-			console.log("error in getting autocompletes: ", textStatus)
+			console.log("error in getting autocompletes: ", errorThrown)
 		success: (data, textStatus, jqXHR) ->
 			this.autocompletes = data
 			console.log(this.autocompletes)
-
-sendMessage = (str) ->
-	return
-
-shiftSidebarFocus = (index) ->
-	sideBarFocus = (numChannels + sideBarFocus + index) % numChannels
-	$("#sidebar a:nth-of-type("+(sideBarFocus+1)+")").focus()
-
-
-# On Document Ready
-$(document).ready ->
-	typingArea.autosize();
-
-	#keypresses that make it to the top level
-	$(document).keydown (e) -> 
-		switch e.keyCode
-			when BACKTICK
-				$("body").toggleClass("sidebarhidden");
-			when ENTER #ENTER
-				typingArea.focu1s();
-			else
-				console.log("uk body", e.keyCode);
-
-	#keypresses on the input box
-	typingArea.keydown (e)->
-		e.stopPropagation();
-		switch e.keyCode
-			when BACKTICK
-				$("body").toggleClass("sidebarhidden");
-				shiftSidebarFocus(0);
-			when TAB  #TAB
-				e.preventDefault();
-				$("body").removeClass("sidebarhidden");
-				shiftSidebarFocus(0);
-				console.log("tab")
-			when ENTER #ENTER
-				e.preventDefault();
-				sendMessage(typingArea.text);
-				$(typingArea).val("");
-			when ESC #ESC
-				console.log("esc");
-				#switch focus from text bar to the sidebar
-				$("body").removeClass("sidebarhidden");
-				shiftSidebarFocus(0)
-			else
-				console.log("uk textbox", e.keyCode);
-
-
-	#navigating in the sidebar
-	sideBar.keydown (e) -> 
-		e.stopPropagation();
-		e.preventDefault
-		switch e.keyCode
-			when TAB
-				e.preventDefault();
-				shiftSidebarFocus(1);
-			when ENTER
-				#TODO loading the right pane
-				sideBar.focus();
-			when UP, K
-				shiftSidebarFocus(-1);
-			when DOWN, J
-				shiftSidebarFocus(1);
-			else
-				console.log("uk inputbox", e.keyCode);
-
-	#sending a "connect to server" message on connect
-	$.ajax "./api/connect/104.236.63.94/oceanman/", 
-		type: "GET"
-		dataType: "html"
-		error: (jqXHR, textStatus, errorThrown) ->
-        	console.log(textStatus);
-		success: (data, textStatus, jqXHR) ->
-			console.log(data);
-			loadUsers();
-			loadAutoCompletes();
