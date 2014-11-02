@@ -179,8 +179,10 @@ body, html {
   right: 0;
   top: 40px;
   bottom: 67px;
-  background-image: url(./static/mountains-08.svg);
-  background-position: fixed; }
+  background-color: transparent;
+  background-image: url(./mountains-08.svg);
+  background-position: left bottom;
+  background-attachment: fixed; }
 
 #topic {
   position: absolute;
