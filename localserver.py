@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from ocean import *
 import unicodedata
 import json, random
@@ -106,9 +106,12 @@ def getAutoCompletes():
     ])
 
 #string 
-@app.route("/api/pushMessage/", methods=['POST'])
-def pushMessage():
-    return "unimplemented"
+@app.route("/api/pushMessage/<channel>", methods=['POST'])
+def pushMessage(channel):
+    print "pushmessage"
+    print request.form["message"]
+    client.send_message(channel, request.form["message"])
+    return "conf"
 
 triggered = False
 @app.route("/api/getMessages/")
