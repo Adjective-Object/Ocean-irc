@@ -37,8 +37,6 @@ $(document).ready ->
 			when ENTER #ENTER
 				typingArea.focus();
 				e.preventDefault();
-			else
-				console.log("uk body", e.keyCode);
 
 	#keypresses on the input box
 	typingArea.keydown (e)->

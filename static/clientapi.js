@@ -1,5 +1,5 @@
 (function() {
-  var activeChannel, autocompletes, fetchMessages, handleLinkClick, initChans, joinChannel, loadAutoCompletes, messages, numChannels, setActiveChannel, sideBar, sideBarFocus, typingArea, users;
+  var activeChannel, autocompletes, buildMsg, fetchMessages, handleLinkClick, initChans, joinChannel, loadAutoCompletes, messages, numChannels, setActiveChannel, sideBar, sideBarFocus, typingArea, users;
 
   typingArea = $("textarea");
 
@@ -51,10 +51,16 @@
         } else if (window.location.hash === ("#" + channame)) {
           setActiveChannel(channame);
         }
-        messages[channame] = [];
+        messages["#" + channame] = [];
         return users.push(data["users"]);
       }
     });
+  };
+
+  buildMsg = function(msg) {
+    var icon;
+    icon = "./static/imgdump/placeholder.gif";
+    return $("#chatcontents").append($("<section class='post'>" + ("<img src='" + icon + "'/>") + ("<section class='name'>" + msg['usr'] + "</section>") + ("<section class='timestamp'>" + msg['timestamp'] + "</section>") + ("<section class='body'>" + msg['msg'] + "</section>") + "</section>"));
   };
 
   fetchMessages = function() {
@@ -70,7 +76,7 @@
         for (_i = 0, _len = data.length; _i < _len; _i++) {
           msg = data[_i];
           messages[msg["channel"]].push(msg);
-          if (msg["channel"] === activeChannel) {
+          if (msg["channel"].substring(1) === activeChannel) {
             _results.push(buildMsg(msg));
           } else {
             _results.push(void 0);

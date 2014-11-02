@@ -1,7 +1,7 @@
 from flask import Flask
 from ocean import *
 import unicodedata
-import json
+import json, random
 app = Flask(__name__)
 
 connected = False
@@ -88,15 +88,19 @@ def getAutoCompletes():
 def pushMessage():
     return "unimplemented"
 
+triggered = False
 @app.route("/api/getMessages/")
 def getMessages():
-    return json.dumps([
-        {   "channel": "#general",
-            "timestamp": 0,
-            "usr": "fakeman",
-            "msg": "TEMP MESSAGE"
-        }
-    ])
+    if random.random() < 0.8:
+        return "[]"
+    else:
+        return json.dumps([
+            {   "channel": "#general",
+                "timestamp": 0,
+                "usr": "fakeman",
+                "msg": "TEMP MESSAGE"
+            }
+        ])
 
 
 if __name__ == "__main__":

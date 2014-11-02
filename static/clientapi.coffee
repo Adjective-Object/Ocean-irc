@@ -46,8 +46,18 @@ joinChannel = (channame) ->
 			else if (window.location.hash == "##{channame}")
 				setActiveChannel(channame)
 
-			messages[channame] = [];
+			messages["##{channame}"] = [];
 			users.push(data["users"])
+
+buildMsg = (msg) ->
+	icon = "./static/imgdump/placeholder.gif";
+	$("#chatcontents").append(
+		$("<section class='post'>"+
+			"<img src='#{icon}'/>"+
+			"<section class='name'>#{msg['usr']}</section>"+
+			"<section class='timestamp'>#{msg['timestamp']}</section>"+
+			"<section class='body'>#{msg['msg']}</section>"+
+		"</section>"));
 
 fetchMessages = ->
 	$.ajax ("./api/getMessages"),
@@ -58,7 +68,7 @@ fetchMessages = ->
 		success: (data, textStatus, jqXHR) ->
 			for msg in data
 				messages[msg["channel"]].push(msg)
-				if (msg["channel"] == activeChannel)
+				if (msg["channel"].substring(1) == activeChannel)
 					buildMsg(msg)
 
 # On Document Ready
