@@ -19,7 +19,7 @@
 
   activeChannel = void 0;
 
-  me = "oceanman";
+  me = void 0;
 
   window.ircapi_sendMessage = function(message) {
     var d;
@@ -85,14 +85,20 @@
   };
 
   buildMsg = function(msg) {
-    var c, icon, n, obj, scroll;
+    var c, date, datestring, hours, icon, minutes, n, obj, scroll, seconds;
     c = $("#chatcontents");
+    date = new Date(msg['timestamp']);
+    hours = date.getHours();
+    minutes = "0" + date.getMinutes();
+    seconds = "0" + date.getSeconds();
+    datestring = hours + ':' + minutes.substr(minutes.length - 2) + ':' + seconds.substr(seconds.length - 2);
     scroll = c.scrollTop() + c.height() >= c.get(0).scrollHeight;
     icon = "./static/imgdump/placeholder.gif";
-    n = $(("<section class='post' sender='" + msg['usr'] + "'>") + ("<img src='" + icon + "'/>") + ("<section class='name'>" + msg['usr'] + "</section>") + ("<section class='timestamp'>" + msg['timestamp'] + "</section>") + "<section class='body'></section>" + "</section>");
+    n = $(("<section class='post' sender='" + msg['usr'] + "'>") + ("<img src='" + icon + "'/>") + ("<section class='name'>" + msg['usr'] + "</section>") + ("<section class='timestamp'>[" + datestring + "]</section>") + "<section class='body'></section>" + "</section>");
     obj = $(".body", n);
     obj.text(msg['msg']).html();
     obj.html(obj.html().replace(/\n/g, '<br/>'));
+    console.log($(c).last().attr("sender"), $(n).attr("sender"));
     if ($(c).last().attr("sender") === $(n).attr("sender")) {
       console.log("collapsing post");
       $(n).addClass("collapsed");
@@ -150,9 +156,9 @@
   };
 
   $(document).ready(function() {
-    return $.ajax("./api/connect/104.236.63.94/oceanman/oceanman/", {
+    return $.ajax("./api/connect/104.236.63.94/oceandog/oceandog/", {
       type: "GET",
-      dataType: "html",
+      dataType: "json",
       error: function(jqXHR, textStatus, errorThrown) {
         return console.log(textStatus);
       },
@@ -166,6 +172,7 @@
           joinChannel(c);
         }
         initChans.reverse();
+        console.log("I am", me);
         return setInterval(fetchMessages, 100);
       }
     });

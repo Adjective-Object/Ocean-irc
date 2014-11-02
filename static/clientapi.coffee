@@ -13,7 +13,7 @@ autocompletes = [];
 channels = {};
 activeChannel = undefined
 
-me = "oceanman"
+me = undefined
 
 window.ircapi_sendMessage = (message) ->
     d = {};
@@ -21,7 +21,6 @@ window.ircapi_sendMessage = (message) ->
     d["msg"] = message;
     d["channel"] = activeChannel;
     d["timestamp"] = Date.now();
-
     
     buildMsg(d);
     messages["##{activeChannel}"].push(d);
@@ -80,12 +79,18 @@ joinChannel = (channame) ->
 buildMsg = (msg) ->
     c = $("#chatcontents");
 
+    date = new Date(msg['timestamp'])
+    hours = date.getHours();
+    minutes = "0" + date.getMinutes();
+    seconds = "0" + date.getSeconds();
+    datestring = hours + ':' + minutes.substr(minutes.length-2) + ':' + seconds.substr(seconds.length-2);
+
     scroll = c.scrollTop() + c.height() >= c.get(0).scrollHeight;
     icon = "./static/imgdump/placeholder.gif";
     n = $("<section class='post' sender='#{msg['usr']}'>"+
             "<img src='#{icon}'/>"+
             "<section class='name'>#{msg['usr']}</section>"+
-            "<section class='timestamp'>#{msg['timestamp']}</section>"+
+            "<section class='timestamp'>[#{datestring}]</section>"+
             "<section class='body'></section>"+
         "</section>");
     obj = $(".body",n)
@@ -94,6 +99,7 @@ buildMsg = (msg) ->
 
     # console.log(">>"c.attr("sender"), $(n).attr("sender"))
 
+    console.log($(c).last().attr("sender"), $(n).attr("sender"))
     if($(c).last().attr("sender") == $(n).attr("sender"))
         console.log("collapsing post");
         $(n).addClass("collapsed");
@@ -135,9 +141,9 @@ pushMessageToServer = (message, channel) ->
 # On Document Ready
 $(document).ready ->
     #sending a "connect to server" message on connect
-    $.ajax "./api/connect/104.236.63.94/oceanman/oceanman/", 
+    $.ajax "./api/connect/104.236.63.94/oceandog/oceandog/", 
         type: "GET"
-        dataType: "html"
+        dataType: "json"
         error: (jqXHR, textStatus, errorThrown) ->
             console.log(textStatus);
         success: (data, textStatus, jqXHR) ->
@@ -146,6 +152,8 @@ $(document).ready ->
             loadAutoCompletes();
             (joinChannel(c) for c in initChans.reverse())
             initChans.reverse();
+
+            console.log("I am", me);
 
             setInterval(fetchMessages, 100);
 
