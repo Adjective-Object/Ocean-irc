@@ -221,12 +221,15 @@ $sidebar-width: 220px;
     left:0;
     right:0;
     top:40px;
-    bottom:67px;
+    bottom:96px;
 
     background-color:transparent;
-    background-image: url(./mountains-08.svg);
+    background-image: url(./corner_header.svg);
     background-position:left bottom;
     background-attachment:fixed;
+    background-repeat:no-repeat;
+    background-size: 100%;
+    background-origin: content-box;
 }
 
 #topic {
@@ -259,6 +262,7 @@ $sidebar-width: 220px;
         resize: none;
         width: 100%;
         padding: 0.5em;
+        font-size:12px;
         height: 8em;
         font-family: "prox-reg";
 
