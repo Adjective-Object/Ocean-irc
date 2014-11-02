@@ -22,47 +22,43 @@ body, html {
 
 #sidebar {
   position: fixed;
-  width: 200px;
+  width: 220px;
   min-height: 100%;
   float: left;
   background-color: #4a8096;
   color: #EFEFEF;
   overflow-x: hidden;
   overflow-y: auto;
-  box-shadow: inset -28px 0px 17px -20px rgba(0, 0, 0, 0.2);
+  /*box-shadow: inset -28px 0px 17px -20px rgba(0,0,0,0.2);*/
   -webkit-transition: width 0.3s cubic-bezier(0.77, 0, 0.175, 1);
   -moz-transition: width 0.3s cubic-bezier(0.77, 0, 0.175, 1);
   -ms-transition: width 0.3s cubic-bezier(0.77, 0, 0.175, 1);
   -o-transition: width 0.3s cubic-bezier(0.77, 0, 0.175, 1);
-  transition: width 0.3s cubic-bezier(0.77, 0, 0.175, 1);
-  /*
-  &:after{
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      box-shadow: inset -28px 0px 17px -20px rgba(0,0,0,0.2);
-      z-index: 5;    
-  }
-  */ }
+  transition: width 0.3s cubic-bezier(0.77, 0, 0.175, 1); }
+  #sidebar:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    box-shadow: inset -28px 0px 17px -20px rgba(0, 0, 0, 0.2);
+    z-index: 5;
+    pointer-events: none; }
   #sidebar header {
-    padding-left: 13%;
-    padding-right: 5%;
     height: 42px;
     line-height: 42px;
     z-index: -1;
     font-family: "prox-semibold";
-    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 3px;
     border-top-color: rgba(255, 255, 255, 0.3);
     border-top-style: solid;
     border-top-width: 1px;
     font-size: 10px;
-    margin-top: 20px;
-    margin-bottom: 20px; }
+    margin-top: 30px;
+    margin-bottom: 20px;
+    cursor: default; }
   #sidebar header:first-child {
     border-top-style: none;
     margin-top: 0px;
@@ -75,6 +71,12 @@ body, html {
     font-size: .7em;
     text-transform: uppercase;
     letter-spacing: 3px; }
+  #sidebar header img {
+    width: 20px;
+    margin-bottom: -5px;
+    margin-top: 10px;
+    margin-left: 25px;
+    margin-right: 10px; }
   #sidebar a:first-child {
     margin-top: 10px; }
   #sidebar a {
@@ -88,19 +90,19 @@ body, html {
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 3px;
-    transition: background .2s ease-in-out,  all .2s;
+    transition: background .2s ease-in-out, all .2s;
     border-left-width: 0;
     border-left-style: solid; }
   #sidebar a.selected {
     background: #6e99ab; }
-  #sidebar a:hover, #sidebar a:focus {
+  #sidebar a:hover, #sidebar a:focus, #sidebar:not(.containsFocus) a.ticked {
     background-color: #6e99ab;
     border-color: #fff;
     border-left-width: 7px;
     border-left-style: solid; }
   #sidebar a:focus {
     outline: none; }
-  #sidebar a.ticked:after {
+  #sidebar a:after {
     content: "";
     border: 6px solid transparent;
     border-right: 12px solid #d2e7ee;
@@ -108,12 +110,19 @@ body, html {
     width: 0;
     height: 0;
     position: absolute;
-    right: 0;
+    right: -12px;
     top: 50%;
     margin-top: -6px;
-    z-index: 6; }
+    z-index: 6;
+    -webkit-transition: right 0.3s ease-in-out;
+    -moz-transition: right 0.3s ease-in-out;
+    -ms-transition: right 0.3s ease-in-out;
+    -o-transition: right 0.3s ease-in-out;
+    transition: right 0.3s ease-in-out; }
+  #sidebar a.ticked:after {
+    right: 0; }
   #sidebar > header, #sidebar > a {
-    width: 200px; }
+    width: 220px; }
 
 #rightbar {
   -webkit-transition: margin-left 0.3s ease-in-out;
@@ -121,22 +130,47 @@ body, html {
   -ms-transition: margin-left 0.3s ease-in-out;
   -o-transition: margin-left 0.3s ease-in-out;
   transition: margin-left 0.3s ease-in-out;
-  margin-left: 200px;
+  margin-left: 220px;
   width: auto;
   min-height: 100%;
   background-color: #fff;
   border-color: #fff;
   border-style: solid;
-  border-left: 300px !important;
-  border-bottom: 100px !important;
-  position: relative; }
+  position: relative;
+  border: 0;
+  border-left-width: 8px;
+  border-left-color: #d2e7ee;
+  border-left-style: solid;
+  padding-bottom: 20%; }
+
+#topic {
+  height: 40px;
+  line-height: 40px;
+  width: 100%;
+  background: #d2e7ee;
+  color: #6db3c9;
+  padding-left: 30px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 12px; }
+
+#usercount {
+  float: right; }
 
 textarea {
+  outline: none !important;
+  border: 0;
+  border-top-width: 8px;
+  border-top-color: #d2e7ee;
+  border-top-style: solid;
   position: absolute;
   bottom: 0px;
   resize: none;
   width: 100%;
-  padding: 7%; }
+  padding: 0.5em;
+  height: 5em;
+  font-family: "prox-reg";
+  overflow-y: auto; }
 
 body.sidebarhidden #sidebar {
   width: 0; }

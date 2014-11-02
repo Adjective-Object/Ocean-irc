@@ -25,9 +25,9 @@ shiftSidebarFocus = (index) ->
 	$("#sidebar a:nth-of-type("+(sideBarFocus+1)+")").focus()
 
 
+
 # On Document Ready
 $(document).ready ->
-	typingArea.autosize();
 
 	#keypresses that make it to the top level
 	$(document).keydown (e) -> 
@@ -54,9 +54,10 @@ $(document).ready ->
 				$("body").removeClass("sidebarhidden");
 				shiftSidebarFocus(0);
 			when ENTER #ENTER
-				e.preventDefault();
-				window.ircapi_sendMessage(typingArea.text);
-				$(typingArea).val("");
+				if (! e.shiftKey)
+					e.preventDefault();
+					window.ircapi_sendMessage(typingArea.text);
+					$(typingArea).val("");
 			when ESC #ESC
 				#switch focus from text bar to the sidebar
 				$("body").removeClass("sidebarhidden");
@@ -80,3 +81,10 @@ $(document).ready ->
 				shiftSidebarFocus(-1);
 			when DOWN, J
 				shiftSidebarFocus(1);
+
+	sideBar.focusin (e) ->
+		$("#sidebar").addClass("containsFocus");
+
+	sideBar.focusout (e) ->
+		$("#sidebar").removeClass("containsFocus");
+	

@@ -86,16 +86,18 @@ def getAutoCompletes():
 #string 
 @app.route("/api/pushMessage/", methods=['PUSH'])
 def pushMessage():
-    return json.dumps([
-            {   "channel": "#general",
-                "timestamp": 0,
-                "user": "fakeman"
-            }
-        ])
+    return "unimplemented"
 
 @app.route("/api/getMessages/")
 def getMessages():
-    return "unimplemented"
+    return json.dumps([
+        {   "channel": "#general",
+            "timestamp": 0,
+            "usr": "fakeman",
+            "msg": "TEMP MESSAGE"
+        }
+    ])
+
 
 if __name__ == "__main__":
     app.run(debug=True)
