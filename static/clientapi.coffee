@@ -36,7 +36,7 @@ setActiveChannel = (chan) ->
 
     $("#topic").text("##{chan} :: " + channels["##{chan}"]["topic"]);
     $("#chatcontents").empty();
-    console.log(chan, messages);
+    #console.log(chan, messages);
     populateChatBuffer(messages["##{chan}"]);
     
     $("#sidebar a[href='##{chan}']").removeAttr("data-notif");
@@ -50,6 +50,7 @@ handleLinkClick = (evt) ->
     setActiveChannel(this.hash.substring(1));
     evt.preventDefault();
 
+#connect to channel
 joinChannel = (channame) ->
     $.ajax ("./api/join/"+channame+"/"),
         type: "GET"
@@ -68,10 +69,13 @@ joinChannel = (channame) ->
             channels["##{channame}"] = data;
             console.log(channels);
 
-            if (window.location.hash == undefined)
-                setActiveChannel(channame); 
-            else if (window.location.hash == "##{channame}")
+            console.log(window.location.hash, "##{channame}");
+            if (window.location.hash == "##{channame}")
+                console.log("ACTIV!!");
                 setActiveChannel(channame)
+            else if (window.location.hash = undefined && initChans.indexOf(channame) == 0 )
+                setActiveChannel(channame)
+            
 
 buildMsg = (msg) ->
     c = $("#chatcontents");
@@ -98,6 +102,7 @@ fetchMessages = ->
         error: (jqXHR, textStatus, errorThrown) ->
             console.log("error in getting messages: ", errorThrown)
         success: (data, textStatus, jqXHR) ->
+            console.log(data);
             for msg in data
                 messages[msg["channel"]].push(msg)
                 if (msg["channel"].substring(1) == activeChannel)
@@ -136,10 +141,6 @@ $(document).ready ->
             (joinChannel(c) for c in initChans.reverse())
             initChans.reverse();
 
-            if (activeChannel == undefined)
-                console.log("OKAY");
-                setActiveChannel("#{initChans[0]}");
-
             setInterval(fetchMessages, 100);
 
 loadAutoCompletes = ->
@@ -150,4 +151,4 @@ loadAutoCompletes = ->
             console.log("error in getting autocompletes: ", errorThrown)
         success: (data, textStatus, jqXHR) ->
             this.autocompletes = data
-            console.log(this.autocompletes)
+            #console.log(this.autocompletes)
