@@ -67,13 +67,15 @@ def getUserList(channel):
     client.send('JOIN %s' % channel)
     while not channel in client.get_channels():
         continue
-    chandata = client.get_channels()[channel]
     """
+    chandata = client.get_channels()[channel]
     for user in chandata:
         user['image'] = random.choice(imgs)
     print chandata
     """
-    return json.dumps(chandata)
+    print "FOR %s" % channel
+    print client.get_channels()
+    return json.dumps(client.get_channels()[channel])
 
 #handles a character being typed
 @app.route("/api/autocompletes/")

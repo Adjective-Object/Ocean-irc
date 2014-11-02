@@ -163,7 +163,7 @@ class OceanClient():
                         self.outbuf.append({
                             u'channel': self.get_recipient(line),
                             u'usr':  self.get_sender(line),
-                            u'msg': ' '.join(line[3:]).strip(),
+                            u'msg': ' '.join(line[3:]).strip()[1:],
                             u'timestamp': str(time.time()).encode('UTF-8')
                         })
                     # Private Messages
@@ -171,7 +171,7 @@ class OceanClient():
                         self.outbuf.append({
                             u'channel': self.get_sender(line),
                             u'usr':  self.get_sender(line),
-                            u'msg': ' '.join(line[3:]).strip(),
+                            u'msg': ' '.join(line[3:]).strip()[1:],
                             u'timestamp': str(time.time()).encode('UTF-8')
                         })
 
@@ -183,9 +183,11 @@ class OceanClient():
                         self.bot_init_plugins()
                     elif line[1] == '332':
                         self.channels[line[4]] = {}
+                        self.channels[line[4]]['public'] = True
                         self.channels[line[4]]['topic'] = ' '.join(line[5:])
                     elif line[1] == '353':
-                        self.channels[line[4]] = [
+                        self.channels[line[4]] = {}
+                        self.channels[line[4]]['users'] = [
                             {'nick': nick.replace(':', '').strip(),
                                 'realname': 'Shia LaBeouf'}
                             for nick in line[5:]]
