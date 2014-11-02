@@ -130,7 +130,7 @@
   };
 
   $(document).ready(function() {
-    return $.ajax("./api/connect/104.236.63.94/oceanman/", {
+    return $.ajax("./api/connect/104.236.63.94/oceanman/oceanman/", {
       type: "GET",
       dataType: "html",
       error: function(jqXHR, textStatus, errorThrown) {

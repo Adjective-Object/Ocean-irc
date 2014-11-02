@@ -111,7 +111,7 @@ fetchMessages = ->
 # On Document Ready
 $(document).ready ->
     #sending a "connect to server" message on connect
-    $.ajax "./api/connect/104.236.63.94/oceanman/", 
+    $.ajax "./api/connect/104.236.63.94/oceanman/oceanman/", 
         type: "GET"
         dataType: "html"
         error: (jqXHR, textStatus, errorThrown) ->

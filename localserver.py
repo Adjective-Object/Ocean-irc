@@ -24,8 +24,8 @@ def rootRoute():
     print
     return send_static_file("./static/client.html")
 
-@app.route("/api/connect/<hostname>/<nick>/<int:port>")
-@app.route("/api/connect/<hostname>/<nick>/")
+@app.route("/api/connect/<hostname>/<username>/<nick>/<int:port>")
+@app.route("/api/connect/<hostname>/<username>/<nick>/")
 def handleConnect(hostname, nick, port=6667):
     """
     global connected
@@ -36,7 +36,12 @@ def handleConnect(hostname, nick, port=6667):
 
     return "already connected..."
     """
-    return "not implemented"
+    #information about the user you just logged in as
+    return {
+        "username": "oceanman",
+        "realname": "Anon",
+        "nick": "nick"
+    }
 
 
 @app.route("/api/join/<channel>/")
