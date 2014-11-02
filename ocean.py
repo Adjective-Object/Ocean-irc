@@ -6,7 +6,8 @@ class Plugin(object):
     """
     name = "plugin-default"
     parameters = []
-
+    version = 0
+    cache_updated = 0
 
     # Initialization
 
@@ -14,7 +15,8 @@ class Plugin(object):
         """ (client side) generates a list of parameters 
             that report the state of the client 
         """
-        pass
+        json.dumps({"version": parameters[version], "cache-updated": parameters[cache-updated]})
+        
 
     def parse_init_params(self, json):
         """ (server side) parses down the list of init
