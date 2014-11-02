@@ -1,21 +1,5 @@
 (function() {
-  var BACKTICK, DOWN, ENTER, ESC, J, K, TAB, UP, autocompletes, loadAutoCompletes, loadUsers, numChannels, sendMessage, shiftSidebarFocus, sideBar, sideBarFocus, typingArea, users;
-
-  ENTER = 13;
-
-  TAB = 9;
-
-  ESC = 27;
-
-  BACKTICK = 192;
-
-  UP = 38;
-
-  DOWN = 40;
-
-  J = 74;
-
-  K = 75;
+  var activeChannel, autocompletes, buildMsg, channels, fetchMessages, handleLinkClick, initChans, joinChannel, loadAutoCompletes, me, messages, numChannels, populateChatBuffer, setActiveChannel, sideBar, sideBarFocus, typingArea;
 
   typingArea = $("textarea");
 
@@ -25,99 +9,127 @@
 
   numChannels = $("#sidebar a").length;
 
+  initChans = ["general", "knurds", "mabois", "urmum"];
+
+  messages = {};
+
   autocompletes = [];
 
-  users = [];
+  channels = {};
 
-  loadUsers = function() {
-    return $.ajax("./api/userlist", {
+  activeChannel = "";
+
+  me = "oceanman";
+
+  window.ircapi_sendMessage = function(message) {
+    var d;
+    d = {};
+    d["usr"] = me;
+    d["msg"] = message;
+    d["channel"] = activeChannel;
+    d["timestamp"] = Date.now();
+    buildMsg(d);
+    return messages["#" + activeChannel].push(d);
+  };
+
+  setActiveChannel = function(chan) {
+    activeChannel = chan;
+    window.location.hash = "#" + chan;
+    $(".ticked").removeClass("ticked");
+    $("#sidebar a[href='#" + chan + "']").addClass("ticked");
+    $("#topic").text(("#" + chan + " :: ") + channels["#" + chan]["topic"]);
+    $("#chatcontents").empty();
+    console.log(chan, messages);
+    populateChatBuffer(messages["#" + chan]);
+    return $("#sidebar a[href='#" + chan + "']").removeAttr("data-notif");
+  };
+
+  populateChatBuffer = function(msgs) {
+    var msg, _i, _len, _results;
+    _results = [];
+    for (_i = 0, _len = msgs.length; _i < _len; _i++) {
+      msg = msgs[_i];
+      _results.push(buildMsg(msg));
+    }
+    return _results;
+  };
+
+  handleLinkClick = function(evt) {
+    setActiveChannel(this.hash.substring(1));
+    return evt.preventDefault();
+  };
+
+  joinChannel = function(channame) {
+    return $.ajax("./api/join/" + channame + "/", {
       type: "GET",
       dataType: "json",
       error: function(jqXHR, textStatus, errorThrown) {
-        return console.log("error in getting userlist: ", textStatus);
+        return console.log("error in getting userlist: ", errorThrown);
       },
       success: function(data, textStatus, jqXHR) {
-        this.users = data;
-        return console.log(this.users);
+        if (data["private"]) {
+          $("<a href=\"#" + channame + "\">#" + channame + "</a>").insertAfter($("#sidebar #privateChannels")).click(handleLinkClick);
+        } else {
+          $("<a href=\"#" + channame + "\">#" + channame + "</a>").insertAfter($("#sidebar #publicChannels")).click(handleLinkClick);
+        }
+        messages["#" + channame] = [];
+        channels["#" + channame] = data;
+        console.log(channels);
+        if (window.location.hash === void 0) {
+          return setActiveChannel(channame);
+        } else if (window.location.hash === ("#" + channame)) {
+          return setActiveChannel(channame);
+        }
       }
     });
   };
 
-  loadAutoCompletes = function() {
-    return $.ajax("./api/autocompletes", {
+  buildMsg = function(msg) {
+    var c, icon, n, obj, scroll;
+    c = $("#chatcontents");
+    scroll = c.scrollTop() + c.height() >= c.get(0).scrollHeight;
+    icon = "./static/imgdump/placeholder.gif";
+    n = $(("<section class='post' sender='" + msg['usr'] + "'>") + ("<img src='" + icon + "'/>") + ("<section class='name'>" + msg['usr'] + "</section>") + ("<section class='timestamp'>" + msg['timestamp'] + "</section>") + "<section class='body'></section>" + "</section>");
+    obj = $(".body", n);
+    obj.text(msg['msg']).html();
+    obj.html(obj.html().replace(/\n/g, '<br/>'));
+    c.append(n);
+    if (scroll) {
+      return c.scrollTop(c.get(0).scrollHeight);
+    }
+  };
+
+  fetchMessages = function() {
+    return $.ajax("./api/getMessages", {
       type: "GET",
       dataType: "json",
       error: function(jqXHR, textStatus, errorThrown) {
-        return console.log("error in getting autocompletes: ", textStatus);
+        return console.log("error in getting userlist: ", errorThrown);
       },
       success: function(data, textStatus, jqXHR) {
-        this.autocompletes = data;
-        return console.log(this.autocompletes);
+        var dval, ln, msg, _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = data.length; _i < _len; _i++) {
+          msg = data[_i];
+          messages[msg["channel"]].push(msg);
+          if (msg["channel"].substring(1) === activeChannel) {
+            _results.push(buildMsg(msg));
+          } else {
+            ln = $("#sidebar a[href='" + msg["channel"] + "']");
+            dval = ln.attr("data-notif");
+            if (dval === void 0) {
+              _results.push(ln.attr("data-notif", 1));
+            } else {
+              _results.push(ln.attr("data-notif", parseInt(dval) + 1));
+            }
+          }
+        }
+        return _results;
       }
     });
-  };
-
-  sendMessage = function(str) {};
-
-  shiftSidebarFocus = function(index) {
-    sideBarFocus = (numChannels + sideBarFocus + index) % numChannels;
-    return $("#sidebar a:nth-of-type(" + (sideBarFocus + 1) + ")").focus();
   };
 
   $(document).ready(function() {
-    typingArea.autosize();
-    $(document).keydown(function(e) {
-      switch (e.keyCode) {
-        case BACKTICK:
-          return $("body").toggleClass("sidebarhidden");
-        case ENTER:
-          return typingArea.focu1s();
-        default:
-          return console.log("uk body", e.keyCode);
-      }
-    });
-    typingArea.keydown(function(e) {
-      e.stopPropagation();
-      switch (e.keyCode) {
-        case BACKTICK:
-          $("body").toggleClass("sidebarhidden");
-          return shiftSidebarFocus(0);
-        case TAB:
-          e.preventDefault();
-          $("body").removeClass("sidebarhidden");
-          shiftSidebarFocus(0);
-          return console.log("tab");
-        case ENTER:
-          e.preventDefault();
-          sendMessage(typingArea.text);
-          return $(typingArea).val("");
-        case ESC:
-          console.log("esc");
-          $("body").removeClass("sidebarhidden");
-          return shiftSidebarFocus(0);
-        default:
-          return console.log("uk textbox", e.keyCode);
-      }
-    });
-    sideBar.keydown(function(e) {
-      e.stopPropagation();
-      e.preventDefault;
-      switch (e.keyCode) {
-        case TAB:
-          e.preventDefault();
-          return shiftSidebarFocus(1);
-        case ENTER:
-          return sideBar.focus();
-        case UP:
-        case K:
-          return shiftSidebarFocus(-1);
-        case DOWN:
-        case J:
-          return shiftSidebarFocus(1);
-        default:
-          return console.log("uk inputbox", e.keyCode);
-      }
-    });
     return $.ajax("./api/connect/104.236.63.94/oceanman/", {
       type: "GET",
       dataType: "html",
@@ -125,11 +137,32 @@
         return console.log(textStatus);
       },
       success: function(data, textStatus, jqXHR) {
+        var c, _i, _len, _ref;
         console.log(data);
-        loadUsers();
-        return loadAutoCompletes();
+        loadAutoCompletes();
+        _ref = initChans.reverse();
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          c = _ref[_i];
+          joinChannel(c);
+        }
+        initChans.reverse();
+        return setInterval(fetchMessages, 100);
       }
     });
   });
+
+  loadAutoCompletes = function() {
+    return $.ajax("./api/autocompletes", {
+      type: "GET",
+      dataType: "json",
+      error: function(jqXHR, textStatus, errorThrown) {
+        return console.log("error in getting autocompletes: ", errorThrown);
+      },
+      success: function(data, textStatus, jqXHR) {
+        this.autocompletes = data;
+        return console.log(this.autocompletes);
+      }
+    });
+  };
 
 }).call(this);

@@ -1,117 +1,136 @@
-#keycode defs
-ENTER = 13;
-TAB = 9
-ESC = 27
-BACKTICK = 192
-
-UP = 38
-DOWN = 40
-J = 74
-K = 75
-
 #special elems of the text
 typingArea = $("textarea");
 sideBar = $("#sidebar");
 sideBarFocus = 0;
 numChannels = $("#sidebar a").length
 
-#data pulled fro, the server
+#init args
+initChans = ["general", "knurds", "mabois", "urmum"];
+messages = {};
+
+#data pulled from the server
 autocompletes = [];
-users = [];
+channels = {};
+activeChannel = ""
+
+me = "oceanman"
+
+window.ircapi_sendMessage = (message) ->
+    d = {};
+    d["usr"] = me;
+    d["msg"] = message;
+    d["channel"] = activeChannel;
+    d["timestamp"] = Date.now();
+
+    
+    buildMsg(d);
+    messages["##{activeChannel}"].push(d);
+
+setActiveChannel = (chan) ->
+    activeChannel = chan;
+    window.location.hash = "##{chan}";
+    $(".ticked").removeClass("ticked");
+    $("#sidebar a[href='##{chan}']").addClass("ticked");
+
+    $("#topic").text("##{chan} :: " + channels["##{chan}"]["topic"]);
+    $("#chatcontents").empty();
+    console.log(chan, messages);
+    populateChatBuffer(messages["##{chan}"]);
+    
+    $("#sidebar a[href='##{chan}']").removeAttr("data-notif");
 
 
-loadUsers = ->
-	$.ajax "./api/userlist",
-		type: "GET"
-		dataType: "json"
-		error: (jqXHR, textStatus, errorThrown) ->
-			console.log("error in getting userlist: ", textStatus)
-		success: (data, textStatus, jqXHR) ->
-			this.users = data
-			console.log(this.users)
+populateChatBuffer = (msgs) ->
+    for msg in msgs
+        buildMsg(msg);
 
-loadAutoCompletes = ->
-	$.ajax "./api/autocompletes",
-		type: "GET"
-		dataType: "json"
-		error: (jqXHR, textStatus, errorThrown) ->
-			console.log("error in getting autocompletes: ", textStatus)
-		success: (data, textStatus, jqXHR) ->
-			this.autocompletes = data
-			console.log(this.autocompletes)
+handleLinkClick = (evt) ->
+    setActiveChannel(this.hash.substring(1));
+    evt.preventDefault();
 
-sendMessage = (str) ->
-	return
+joinChannel = (channame) ->
+    $.ajax ("./api/join/"+channame+"/"),
+        type: "GET"
+        dataType: "json"
+        error: (jqXHR, textStatus, errorThrown) ->
+            console.log("error in getting userlist: ", errorThrown)
+        success: (data, textStatus, jqXHR) ->
+            if (data["private"])
+                $("<a href=\"##{channame}\">##{channame}</a>").insertAfter(
+                    $("#sidebar #privateChannels")).click(handleLinkClick);
+            else
+                $("<a href=\"##{channame}\">##{channame}</a>").insertAfter(
+                    $("#sidebar #publicChannels")).click(handleLinkClick);
 
-shiftSidebarFocus = (index) ->
-	sideBarFocus = (numChannels + sideBarFocus + index) % numChannels
-	$("#sidebar a:nth-of-type("+(sideBarFocus+1)+")").focus()
+            messages["##{channame}"] = [];
+            channels["##{channame}"] = data;
+            console.log(channels);
 
+            if (window.location.hash == undefined)
+                setActiveChannel(channame); 
+            else if (window.location.hash == "##{channame}")
+                setActiveChannel(channame)
+
+buildMsg = (msg) ->
+    c = $("#chatcontents");
+
+    scroll = c.scrollTop() + c.height() >= c.get(0).scrollHeight;
+    icon = "./static/imgdump/placeholder.gif";
+    n = $("<section class='post' sender='#{msg['usr']}'>"+
+            "<img src='#{icon}'/>"+
+            "<section class='name'>#{msg['usr']}</section>"+
+            "<section class='timestamp'>#{msg['timestamp']}</section>"+
+            "<section class='body'></section>"+
+        "</section>");
+    obj = $(".body",n)
+    obj.text(msg['msg']).html();
+    obj.html(obj.html().replace(/\n/g,'<br/>'));
+    c.append(n);
+    if scroll
+        c.scrollTop(c.get(0).scrollHeight)
+
+fetchMessages = ->
+    $.ajax ("./api/getMessages"),
+        type: "GET"
+        dataType: "json"
+        error: (jqXHR, textStatus, errorThrown) ->
+            console.log("error in getting userlist: ", errorThrown)
+        success: (data, textStatus, jqXHR) ->
+            for msg in data
+                messages[msg["channel"]].push(msg)
+                if (msg["channel"].substring(1) == activeChannel)
+                    buildMsg(msg)
+                else
+                    ln = $("#sidebar a[href='#{(msg["channel"])}']");
+                    dval = ln.attr("data-notif");
+                    if dval == undefined
+                        ln.attr("data-notif", 1);
+                    else
+                        ln.attr("data-notif", parseInt(dval)+1);
 
 # On Document Ready
 $(document).ready ->
-	typingArea.autosize();
+    #sending a "connect to server" message on connect
+    $.ajax "./api/connect/104.236.63.94/oceanman/", 
+        type: "GET"
+        dataType: "html"
+        error: (jqXHR, textStatus, errorThrown) ->
+            console.log(textStatus);
+        success: (data, textStatus, jqXHR) ->
+            console.log(data);
+            #load users and autocompletes when connected
+            loadAutoCompletes();
+            (joinChannel(c) for c in initChans.reverse())
+            initChans.reverse();
 
-	#keypresses that make it to the top level
-	$(document).keydown (e) -> 
-		switch e.keyCode
-			when BACKTICK
-				$("body").toggleClass("sidebarhidden");
-			when ENTER #ENTER
-				typingArea.focu1s();
-			else
-				console.log("uk body", e.keyCode);
+            setInterval(fetchMessages, 100);
 
-	#keypresses on the input box
-	typingArea.keydown (e)->
-		e.stopPropagation();
-		switch e.keyCode
-			when BACKTICK
-				$("body").toggleClass("sidebarhidden");
-				shiftSidebarFocus(0);
-			when TAB  #TAB
-				e.preventDefault();
-				$("body").removeClass("sidebarhidden");
-				shiftSidebarFocus(0);
-				console.log("tab")
-			when ENTER #ENTER
-				e.preventDefault();
-				sendMessage(typingArea.text);
-				$(typingArea).val("");
-			when ESC #ESC
-				console.log("esc");
-				#switch focus from text bar to the sidebar
-				$("body").removeClass("sidebarhidden");
-				shiftSidebarFocus(0)
-			else
-				console.log("uk textbox", e.keyCode);
-
-
-	#navigating in the sidebar
-	sideBar.keydown (e) -> 
-		e.stopPropagation();
-		e.preventDefault
-		switch e.keyCode
-			when TAB
-				e.preventDefault();
-				shiftSidebarFocus(1);
-			when ENTER
-				#TODO loading the right pane
-				sideBar.focus();
-			when UP, K
-				shiftSidebarFocus(-1);
-			when DOWN, J
-				shiftSidebarFocus(1);
-			else
-				console.log("uk inputbox", e.keyCode);
-
-	#sending a "connect to server" message on connect
-	$.ajax "./api/connect/104.236.63.94/oceanman/", 
-		type: "GET"
-		dataType: "html"
-		error: (jqXHR, textStatus, errorThrown) ->
-        	console.log(textStatus);
-		success: (data, textStatus, jqXHR) ->
-			console.log(data);
-			loadUsers();
-			loadAutoCompletes();
+loadAutoCompletes = ->
+    $.ajax "./api/autocompletes",
+        type: "GET"
+        dataType: "json"
+        error: (jqXHR, textStatus, errorThrown) ->
+            console.log("error in getting autocompletes: ", errorThrown)
+        success: (data, textStatus, jqXHR) ->
+            this.autocompletes = data
+            console.log(this.autocompletes)
