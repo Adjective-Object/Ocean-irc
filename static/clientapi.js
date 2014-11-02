@@ -1,5 +1,5 @@
 (function() {
-  var activeChannel, autocompletes, handleLinkClick, initChans, joinChannel, loadAutoCompletes, numChannels, setActiveChannel, sideBar, sideBarFocus, typingArea, users;
+  var activeChannel, autocompletes, fetchMessages, handleLinkClick, initChans, joinChannel, loadAutoCompletes, messages, numChannels, setActiveChannel, sideBar, sideBarFocus, typingArea, users;
 
   typingArea = $("textarea");
 
@@ -10,6 +10,8 @@
   numChannels = $("#sidebar a").length;
 
   initChans = ["general", "mabois", "knurds"];
+
+  messages = {};
 
   autocompletes = [];
 
@@ -41,11 +43,40 @@
       success: function(data, textStatus, jqXHR) {
         if (data["private"]) {
           $("<a href=\"#" + channame + "\">#" + channame + "</a>").insertAfter($("#sidebar #privateChannels")).click(handleLinkClick);
-          setActiveChannel(channame);
         } else {
           $("<a href=\"#" + channame + "\">#" + channame + "</a>").insertAfter($("#sidebar #publicChannels")).click(handleLinkClick);
         }
+        if (window.location.hash === void 0) {
+          setActiveChannel(channame);
+        } else if (window.location.hash === ("#" + channame)) {
+          setActiveChannel(channame);
+        }
+        messages[channame] = [];
         return users.push(data["users"]);
+      }
+    });
+  };
+
+  fetchMessages = function() {
+    return $.ajax("./api/getMessages", {
+      type: "GET",
+      dataType: "json",
+      error: function(jqXHR, textStatus, errorThrown) {
+        return console.log("error in getting userlist: ", errorThrown);
+      },
+      success: function(data, textStatus, jqXHR) {
+        var msg, _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = data.length; _i < _len; _i++) {
+          msg = data[_i];
+          messages[msg["channel"]].push(msg);
+          if (msg["channel"] === activeChannel) {
+            _results.push(buildMsg(msg));
+          } else {
+            _results.push(void 0);
+          }
+        }
+        return _results;
       }
     });
   };
@@ -66,7 +97,8 @@
           c = _ref[_i];
           joinChannel(c);
         }
-        return initChans.reverse();
+        initChans.reverse();
+        return setInterval(fetchMessages, 100);
       }
     });
   });

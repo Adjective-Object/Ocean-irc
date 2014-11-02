@@ -5,12 +5,14 @@ sideBarFocus = 0;
 numChannels = $("#sidebar a").length
 
 #init args
-initChans = ["general", "mabois", "knurds"]
+initChans = ["general", "mabois", "knurds"];
+messages = {};
 
 #data pulled from the server
 autocompletes = [];
 users = [];
 activeChannel = ""
+
 
 window.ircapi_sendMessage = (str) ->
 	return
@@ -25,24 +27,39 @@ handleLinkClick = (evt) ->
 	setActiveChannel(this.hash.substring(1));
 	evt.preventDefault();
 
-
 joinChannel = (channame) ->
 	$.ajax ("./api/join/"+channame+"/"),
-	type: "GET"
-	dataType: "json"
-	error: (jqXHR, textStatus, errorThrown) ->
-		console.log("error in getting userlist: ", errorThrown)
-	success: (data, textStatus, jqXHR) ->
-		if(data["private"])
-			$("<a href=\"##{channame}\">##{channame}</a>").insertAfter(
-				$("#sidebar #privateChannels")).click(handleLinkClick);
-			setActiveChannel(channame);
-		else
-			$("<a href=\"##{channame}\">##{channame}</a>").insertAfter(
-				$("#sidebar #publicChannels")).click(handleLinkClick);
-			
+		type: "GET"
+		dataType: "json"
+		error: (jqXHR, textStatus, errorThrown) ->
+			console.log("error in getting userlist: ", errorThrown)
+		success: (data, textStatus, jqXHR) ->
+			if (data["private"])
+				$("<a href=\"##{channame}\">##{channame}</a>").insertAfter(
+					$("#sidebar #privateChannels")).click(handleLinkClick);
+			else
+				$("<a href=\"##{channame}\">##{channame}</a>").insertAfter(
+					$("#sidebar #publicChannels")).click(handleLinkClick);
 
-		users.push(data["users"])
+			if (window.location.hash == undefined)
+				setActiveChannel(channame);	
+			else if (window.location.hash == "##{channame}")
+				setActiveChannel(channame)
+
+			messages[channame] = [];
+			users.push(data["users"])
+
+fetchMessages = ->
+	$.ajax ("./api/getMessages"),
+		type: "GET"
+		dataType: "json"
+		error: (jqXHR, textStatus, errorThrown) ->
+			console.log("error in getting userlist: ", errorThrown)
+		success: (data, textStatus, jqXHR) ->
+			for msg in data
+				messages[msg["channel"]].push(msg)
+				if (msg["channel"] == activeChannel)
+					buildMsg(msg)
 
 # On Document Ready
 $(document).ready ->
@@ -58,6 +75,8 @@ $(document).ready ->
 			loadAutoCompletes();
 			(joinChannel(c) for c in initChans.reverse())
 			initChans.reverse();
+
+			setInterval(fetchMessages, 100);
 
 loadAutoCompletes = ->
 	$.ajax "./api/autocompletes",
