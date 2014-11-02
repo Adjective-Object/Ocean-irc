@@ -1,5 +1,5 @@
 (function() {
-  var activeChannel, autocompletes, buildMsg, channels, fetchMessages, handleLinkClick, initChans, joinChannel, loadAutoCompletes, me, messages, numChannels, populateChatBuffer, setActiveChannel, sideBar, sideBarFocus, typingArea;
+  var activeChannel, autocompletes, buildMsg, channels, fetchMessages, handleLinkClick, initChans, joinChannel, loadAutoCompletes, me, messages, numChannels, populateChatBuffer, pushMessageToServer, setActiveChannel, sideBar, sideBarFocus, typingArea;
 
   typingArea = $("textarea");
 
@@ -29,7 +29,8 @@
     d["channel"] = activeChannel;
     d["timestamp"] = Date.now();
     buildMsg(d);
-    return messages["#" + activeChannel].push(d);
+    messages["#" + activeChannel].push(d);
+    return pushMessageToServer(message, activeChannel);
   };
 
   setActiveChannel = function(chan) {
@@ -64,7 +65,7 @@
       type: "GET",
       dataType: "json",
       error: function(jqXHR, textStatus, errorThrown) {
-        return console.log("error in getting userlist: ", errorThrown);
+        return console.log("error in joining channel: ", errorThrown);
       },
       success: function(data, textStatus, jqXHR) {
         if (data["private"]) {
@@ -104,7 +105,7 @@
       type: "GET",
       dataType: "json",
       error: function(jqXHR, textStatus, errorThrown) {
-        return console.log("error in getting userlist: ", errorThrown);
+        return console.log("error in getting messages: ", errorThrown);
       },
       success: function(data, textStatus, jqXHR) {
         var dval, ln, msg, _i, _len, _results;
@@ -125,6 +126,22 @@
           }
         }
         return _results;
+      }
+    });
+  };
+
+  pushMessageToServer = function(message, channel) {
+    return $.ajax("./api/pushMessage/" + channel, {
+      type: "POST",
+      dataType: "json",
+      data: {
+        "message": message
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        return console.log("error in getting messages: ", errorThrown);
+      },
+      success: function(data, textStatus, jqXHR) {
+        return console.log("posted, cool");
       }
     });
   };
