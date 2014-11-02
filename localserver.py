@@ -58,6 +58,44 @@ def handleConnect(hostname, username, nick, realname="Shia Labeouf", port=6667):
         "nick": nick})
 
 
+imgs = ["./static/imgdump/user-icon-09.svg",
+        "./static/imgdump/user-icon-10.svg",
+        "./static/imgdump/user-icon-11.svg"]
+users = [
+                {   "realname": "PJ Rosa",
+                    "nick": "de-mote",
+                    "icon": random.choice(imgs)
+                },
+                {   "realname": "Jeff Tao",
+                    "nick": "jtao",
+                    "icon": random.choice(imgs)
+                },
+                {   "realname": "Nolan Lum",
+                    "nick": "nolm",
+                    "icon": random.choice(imgs)
+                },
+                {   "realname": "God Damn Billy",
+                    "nick": "insectMechanics",
+                    "icon": random.choice(imgs)
+                },
+                {   "realname": "insectMechanics",
+                    "nick": "God Damn Billy",
+                    "icon": random.choice(imgs)
+                },
+                {   "realname": "PRo Koder",
+                    "nick": "PRoKoder",
+                    "icon": random.choice(imgs)
+                },
+                {   "realname": "Ocean Dog",
+                    "nick": "oceandog",
+                    "icon": random.choice(imgs)
+                },
+                {   "realname": "Ocean Man",
+                    "nick": "oceanman",
+                    "icon": random.choice(imgs)
+                }
+            ]
+
 @app.route("/api/join/<channel>/")
 def getUserList(channel):
     client.send('JOIN %s' % channel)
@@ -68,26 +106,7 @@ def getUserList(channel):
     return json.dumps(
         {   "public": True,
             "topic": "WHERE WIFI GOES TO DIE",
-            "users": [
-                {   "realname": "PJ Rosa",
-                    "nick": "de-mote"
-                },
-                {   "realname": "Jeff Tao",
-                    "nick": "jtao"
-                },
-                {   "realname": "Nolan Lum",
-                    "nick": "nolm"
-                },
-                {   "realname": "God Damn Billy",
-                    "nick": "insectMechanics"
-                },
-                {   "realname": "insectMechanics",
-                    "nick": "God Damn Billy"
-                },
-                {   "realname": "PRo Koder",
-                    "nick": "PRoKoder"
-                }
-            ]})
+            "users": users})
 
 #handles a character being typed
 @app.route("/api/autocompletes/")

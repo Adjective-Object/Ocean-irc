@@ -19,7 +19,7 @@ window.ircapi_sendMessage = (message) ->
     d = {};
     d["usr"] = me["username"];
     d["msg"] = message;
-    d["channel"] = activeChannel;
+    d["channel"] = "#"+activeChannel;
     d["timestamp"] = Date.now();
     
     buildMsg(d);
@@ -79,14 +79,18 @@ joinChannel = (channame) ->
 buildMsg = (msg) ->
     c = $("#chatcontents");
 
-    date = new Date(msg['timestamp'])
+    date = new Date(parseFloat(msg['timestamp']))
     hours = date.getHours();
     minutes = "0" + date.getMinutes();
     seconds = "0" + date.getSeconds();
     datestring = hours + ':' + minutes.substr(minutes.length-2) + ':' + seconds.substr(seconds.length-2);
 
     scroll = c.scrollTop() + c.height() >= c.get(0).scrollHeight;
-    icon = "./static/imgdump/user-icon-09.svg";
+    icon = "./static/imgdump/placeholder.gif";
+    for user in channels[msg["channel"]]["users"]
+        if user["nick"] == msg["usr"]
+            icon = user["icon"]
+
     n = $("<section class='post' sender='#{msg['usr']}'>"+
             "<img src='#{icon}'/>"+
             "<section class='name'>#{msg['usr']}</section>"+
@@ -115,6 +119,7 @@ fetchMessages = ->
         success: (data, textStatus, jqXHR) ->
             #console.log(data);
             for msg in data
+                console.log(msg)
                 messages[msg["channel"]].push(msg)
                 if (msg["channel"].substring(1) == activeChannel)
                     buildMsg(msg)
@@ -148,6 +153,7 @@ $(document).ready ->
         success: (data, textStatus, jqXHR) ->
             me = data
             #load users and autocompletes when connected
+
             loadAutoCompletes();
             (joinChannel(c) for c in initChans.reverse())
             initChans.reverse();
@@ -155,6 +161,7 @@ $(document).ready ->
             console.log("I am", me);
 
             setInterval(fetchMessages, 100);
+
 
 loadAutoCompletes = ->
     $.ajax "./api/autocompletes",

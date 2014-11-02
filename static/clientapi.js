@@ -26,7 +26,7 @@
     d = {};
     d["usr"] = me["username"];
     d["msg"] = message;
-    d["channel"] = activeChannel;
+    d["channel"] = "#" + activeChannel;
     d["timestamp"] = Date.now();
     buildMsg(d);
     messages["#" + activeChannel].push(d);
@@ -85,15 +85,22 @@
   };
 
   buildMsg = function(msg) {
-    var c, date, datestring, hours, icon, minutes, n, obj, scroll, seconds;
+    var c, date, datestring, hours, icon, minutes, n, obj, scroll, seconds, user, _i, _len, _ref;
     c = $("#chatcontents");
-    date = new Date(msg['timestamp']);
+    date = new Date(parseFloat(msg['timestamp']));
     hours = date.getHours();
     minutes = "0" + date.getMinutes();
     seconds = "0" + date.getSeconds();
     datestring = hours + ':' + minutes.substr(minutes.length - 2) + ':' + seconds.substr(seconds.length - 2);
     scroll = c.scrollTop() + c.height() >= c.get(0).scrollHeight;
-    icon = "./static/imgdump/user-icon-09.svg";
+    icon = "./static/imgdump/placeholder.gif";
+    _ref = channels[msg["channel"]]["users"];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      user = _ref[_i];
+      if (user["nick"] === msg["usr"]) {
+        icon = user["icon"];
+      }
+    }
     n = $(("<section class='post' sender='" + msg['usr'] + "'>") + ("<img src='" + icon + "'/>") + ("<section class='name'>" + msg['usr'] + "</section>") + ("<section class='timestamp'>[" + datestring + "]</section>") + "<section class='body'></section>" + "</section>");
     obj = $(".body", n);
     obj.text(msg['msg']).html();
@@ -120,6 +127,7 @@
         _results = [];
         for (_i = 0, _len = data.length; _i < _len; _i++) {
           msg = data[_i];
+          console.log(msg);
           messages[msg["channel"]].push(msg);
           if (msg["channel"].substring(1) === activeChannel) {
             _results.push(buildMsg(msg));
