@@ -24,7 +24,7 @@
   window.ircapi_sendMessage = function(message) {
     var d;
     d = {};
-    d["usr"] = me;
+    d["usr"] = me["usename"];
     d["msg"] = message;
     d["channel"] = activeChannel;
     d["timestamp"] = Date.now();
@@ -138,7 +138,7 @@
       },
       success: function(data, textStatus, jqXHR) {
         var c, _i, _len, _ref;
-        console.log(data);
+        me = data;
         loadAutoCompletes();
         _ref = initChans.reverse();
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {

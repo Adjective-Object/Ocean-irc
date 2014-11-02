@@ -17,7 +17,7 @@ me = "oceanman"
 
 window.ircapi_sendMessage = (message) ->
     d = {};
-    d["usr"] = me;
+    d["usr"] = me["usename"];
     d["msg"] = message;
     d["channel"] = activeChannel;
     d["timestamp"] = Date.now();
@@ -117,7 +117,7 @@ $(document).ready ->
         error: (jqXHR, textStatus, errorThrown) ->
             console.log(textStatus);
         success: (data, textStatus, jqXHR) ->
-            console.log(data);
+            me = data
             #load users and autocompletes when connected
             loadAutoCompletes();
             (joinChannel(c) for c in initChans.reverse())
