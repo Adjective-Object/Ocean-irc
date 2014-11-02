@@ -178,9 +178,14 @@ body, html {
   left: 0;
   right: 0;
   top: 40px;
-  bottom: 67px;
-  background-image: url(./static/mountains-08.svg);
-  background-position: fixed; }
+  bottom: 96px;
+  background-color: transparent;
+  background-image: url(./corner_header.svg);
+  background-position: left bottom;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: 100%;
+  background-origin: content-box; }
 
 #topic {
   position: absolute;
@@ -224,3 +229,5 @@ body.sidebarhidden #sidebar {
   width: 0; }
 body.sidebarhidden #rightbar {
   margin-left: 0; }
+
+/*# sourceMappingURL=clientstyle.css.map */

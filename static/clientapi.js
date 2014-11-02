@@ -17,7 +17,7 @@
 
   channels = {};
 
-  activeChannel = "";
+  activeChannel = void 0;
 
   me = "oceanman";
 
@@ -163,6 +163,10 @@
           joinChannel(c);
         }
         initChans.reverse();
+        if (activeChannel === void 0) {
+          console.log("OKAY");
+          setActiveChannel("" + initChans[0]);
+        }
         return setInterval(fetchMessages, 100);
       }
     });

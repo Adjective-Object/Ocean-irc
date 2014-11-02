@@ -1,13 +1,15 @@
 from flask import Flask, request
+import logging
 from ocean import *
 import unicodedata
 import json, random
 import threading
-import logging
 app = Flask(__name__)
 
+import logging
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
+
 
 connected = False
 client = OceanClient()
@@ -111,7 +113,7 @@ def pushMessage(channel):
     print "pushmessage"
     print request.form["message"]
     client.send_message(channel, request.form["message"])
-    return "conf"
+    return "{}"
 
 triggered = False
 @app.route("/api/getMessages/")
@@ -133,7 +135,6 @@ def getMessages():
             }
         ])
     """
-
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0')

@@ -11,7 +11,7 @@ messages = {};
 #data pulled from the server
 autocompletes = [];
 channels = {};
-activeChannel = ""
+activeChannel = undefined
 
 me = "oceanman"
 
@@ -135,6 +135,10 @@ $(document).ready ->
             loadAutoCompletes();
             (joinChannel(c) for c in initChans.reverse())
             initChans.reverse();
+
+            if (activeChannel == undefined)
+                console.log("OKAY");
+                setActiveChannel("#{initChans[0]}");
 
             setInterval(fetchMessages, 100);
 
