@@ -1,8 +1,14 @@
 from flask import Flask, request
+import logging
 from ocean import *
 import unicodedata
 import json, random
 app = Flask(__name__)
+
+import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+
 
 connected = False
 client = OceanClient()
@@ -92,7 +98,7 @@ def getAutoCompletes():
 @app.route("/api/pushMessage/<channel>", methods=['POST'])
 def pushMessage(channel):
     print request.form["message"]
-    return "conf"
+    return "{}"
 
 triggered = False
 @app.route("/api/getMessages/")
@@ -107,7 +113,6 @@ def getMessages():
                 "msg": "TEMP MESSAGE"
             }
         ])
-
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0')

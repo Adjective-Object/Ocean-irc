@@ -211,13 +211,17 @@ textarea {
   border-top-width: 1px;
   border-top-color: #d2e7ee;
   border-top-style: solid;
+  border-left-width: 50px;
+  border-left-color: #edf6f9;
+  border-left-style: solid;
   position: absolute;
   bottom: 0px;
   resize: none;
   width: 100%;
-  padding: 0.5em;
-  font-size: 12px;
-  height: 8em;
+  padding-left: 10px;
+  padding-top: 10px;
+  padding-right: 10%;
+  height: 60px;
   font-family: "prox-reg";
   overflow-y: auto; }
 
