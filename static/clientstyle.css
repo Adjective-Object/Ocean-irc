@@ -160,6 +160,7 @@ body, html {
   -o-transition: margin-left 0.3s ease-in-out;
   transition: margin-left 0.3s ease-in-out;
   margin-left: 220px;
+  margin-right: 120px;
   width: auto;
   min-height: 100%;
   background-color: #fff;
@@ -180,9 +181,8 @@ body, html {
   top: 40px;
   bottom: 60px;
   background-color: transparent;
-  background-image: url(./mountains-08.svg);
+  background-image: url(./mountains-14.svg);
   background-position: left bottom;
-  background-attachment: fixed;
   background-repeat: no-repeat;
   background-size: 100%;
   background-origin: content-box; }
@@ -252,9 +252,40 @@ textarea {
   font-family: "prox-reg";
   overflow-y: auto; }
 
+#users {
+  font-family: "prox-semibold";
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: #6db3c9;
+  margin-right: auto;
+  height: 40px;
+  width: 100%;
+  line-height: 40px;
+  cursor: default; }
+
+#users img {
+  width: 10px;
+  margin-left: 27px;
+  margin-right: 10px; }
+
+#userbar {
+  width: 120px;
+  height: 100%;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  letter-spacing: 2px;
+  background-color: #fff;
+  color: #6db3c9;
+  margin-left: -10px;
+  font-size: 12px;
+  font-family: 'prox-reg';
+  border-left-style: solid;
+  border-left-color: #6db3c9;
+  border-left-width: 1px; }
+
 body.sidebarhidden #sidebar {
   width: 0; }
 body.sidebarhidden #rightbar {
   margin-left: 0; }
-
-/*# sourceMappingURL=clientstyle.css.map */
