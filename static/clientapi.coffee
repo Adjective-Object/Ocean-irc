@@ -13,15 +13,14 @@ autocompletes = [];
 channels = {};
 activeChannel = undefined
 
-me = "oceanman"
+me = undefined
 
 window.ircapi_sendMessage = (message) ->
     d = {};
     d["usr"] = me["username"];
     d["msg"] = message;
-    d["channel"] = activeChannel;
+    d["channel"] = "#"+activeChannel;
     d["timestamp"] = Date.now();
-
     
     buildMsg(d);
     messages["##{activeChannel}"].push(d);
@@ -80,21 +79,31 @@ joinChannel = (channame) ->
 buildMsg = (msg) ->
     c = $("#chatcontents");
 
+    date = new Date(parseFloat(msg['timestamp']))
+    hours = date.getHours();
+    minutes = "0" + date.getMinutes();
+    seconds = "0" + date.getSeconds();
+    datestring = hours + ':' + minutes.substr(minutes.length-2) + ':' + seconds.substr(seconds.length-2);
+
     scroll = c.scrollTop() + c.height() >= c.get(0).scrollHeight;
     icon = "./static/imgdump/placeholder.gif";
+    for user in channels[msg["channel"]]["users"]
+        if user["nick"] == msg["usr"]
+            icon = user["icon"]
+
     n = $("<section class='post' sender='#{msg['usr']}'>"+
             "<img src='#{icon}'/>"+
             "<section class='name'>#{msg['usr']}</section>"+
-            "<section class='timestamp'>#{msg['timestamp']}</section>"+
+            "<section class='timestamp'>[#{datestring}]</section>"+
             "<section class='body'></section>"+
         "</section>");
     obj = $(".body",n)
     obj.text(msg['msg']).html();
     obj.html(obj.html().replace(/\n/g,'<br/>'));
 
-    # console.log(">>"c.attr("sender"), $(n).attr("sender"))
+    # console.log($(".post:last-child").attr("sender"), $(n).attr("sender"))
 
-    if($(c).last().attr("sender") == $(n).attr("sender"))
+    if($(".post:last-child").attr("sender") == $(n).attr("sender"))
         console.log("collapsing post");
         $(n).addClass("collapsed");
     c.append(n);
@@ -110,6 +119,7 @@ fetchMessages = ->
         success: (data, textStatus, jqXHR) ->
             #console.log(data);
             for msg in data
+                console.log(msg)
                 messages[msg["channel"]].push(msg)
                 if (msg["channel"].substring(1) == activeChannel)
                     buildMsg(msg)
@@ -135,19 +145,23 @@ pushMessageToServer = (message, channel) ->
 # On Document Ready
 $(document).ready ->
     #sending a "connect to server" message on connect
-    $.ajax "./api/connect/104.236.63.94/oceanman/oceanman/", 
+    $.ajax "./api/connect/104.236.63.94/oceandog/oceandog/", 
         type: "GET"
-        dataType: "html"
+        dataType: "json"
         error: (jqXHR, textStatus, errorThrown) ->
             console.log(textStatus);
         success: (data, textStatus, jqXHR) ->
             me = data
             #load users and autocompletes when connected
+
             loadAutoCompletes();
             (joinChannel(c) for c in initChans.reverse())
             initChans.reverse();
 
+            console.log("I am", me);
+
             setInterval(fetchMessages, 100);
+
 
 loadAutoCompletes = ->
     $.ajax "./api/autocompletes",
