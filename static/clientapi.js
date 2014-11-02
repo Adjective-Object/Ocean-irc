@@ -93,13 +93,12 @@
     seconds = "0" + date.getSeconds();
     datestring = hours + ':' + minutes.substr(minutes.length - 2) + ':' + seconds.substr(seconds.length - 2);
     scroll = c.scrollTop() + c.height() >= c.get(0).scrollHeight;
-    icon = "./static/imgdump/placeholder.gif";
+    icon = "./static/imgdump/user-icon-09.svg";
     n = $(("<section class='post' sender='" + msg['usr'] + "'>") + ("<img src='" + icon + "'/>") + ("<section class='name'>" + msg['usr'] + "</section>") + ("<section class='timestamp'>[" + datestring + "]</section>") + "<section class='body'></section>" + "</section>");
     obj = $(".body", n);
     obj.text(msg['msg']).html();
     obj.html(obj.html().replace(/\n/g, '<br/>'));
-    console.log($(c).last().attr("sender"), $(n).attr("sender"));
-    if ($(c).last().attr("sender") === $(n).attr("sender")) {
+    if ($(".post:last-child").attr("sender") === $(n).attr("sender")) {
       console.log("collapsing post");
       $(n).addClass("collapsed");
     }
