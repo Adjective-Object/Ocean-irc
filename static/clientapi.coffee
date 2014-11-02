@@ -10,19 +10,22 @@ initChans = ["general", "mabois", "knurds"]
 #data pulled from the server
 autocompletes = [];
 users = [];
-channels = [];
+activeChannel = ""
 
 window.ircapi_sendMessage = (str) ->
 	return
 
-$("#sidebar a").click (evt) ->
-	evt.preventDefault()
-	channel = this.hash.substring(1);
-
-	window.location.hash = this.hash;
-	$(".ticked").removeClasss(".ticked");
-	this.addClass(".ticked");
+setActiveChannel = (chan) ->
+	activeChannel = chan;
+	window.location.hash = "##{chan}";
+	$(".ticked").removeClass("ticked");
+	$("#sidebar a[href='##{chan}']").addClass("ticked");
 	
+handleLinkClick = (evt) ->
+	setActiveChannel(this.hash.substring(1));
+	evt.preventDefault();
+
+
 joinChannel = (channame) ->
 	$.ajax ("./api/join/"+channame+"/"),
 	type: "GET"
@@ -30,10 +33,16 @@ joinChannel = (channame) ->
 	error: (jqXHR, textStatus, errorThrown) ->
 		console.log("error in getting userlist: ", errorThrown)
 	success: (data, textStatus, jqXHR) ->
-		$("#sidebar #publicChannels").after(
-			$("<a href=\"##{channame}\">##{channame}</a>")
-		);
-		users.push(data)
+		if(data["private"])
+			$("<a href=\"##{channame}\">##{channame}</a>").insertAfter(
+				$("#sidebar #privateChannels")).click(handleLinkClick);
+			setActiveChannel(channame);
+		else
+			$("<a href=\"##{channame}\">##{channame}</a>").insertAfter(
+				$("#sidebar #publicChannels")).click(handleLinkClick);
+			
+
+		users.push(data["users"])
 
 # On Document Ready
 $(document).ready ->
@@ -48,20 +57,7 @@ $(document).ready ->
 			#load users and autocompletes when connected
 			loadAutoCompletes();
 			(joinChannel(c) for c in initChans.reverse())
-			channel = channels[0]
-
-
-initialJoin = ->
-	console.log("./api/userlist/"+channel+"/");
-	joinChannel()
-	$.ajax ("./api/join/"+channel+"/"),
-		type: "GET"
-		dataType: "json"
-		error: (jqXHR, textStatus, errorThrown) ->
-			console.log("error in getting userlist: ", errorThrown)
-		success: (data, textStatus, jqXHR) ->
-			this.users = data
-			console.log(this.users)
+			initChans.reverse();
 
 loadAutoCompletes = ->
 	$.ajax "./api/autocompletes",

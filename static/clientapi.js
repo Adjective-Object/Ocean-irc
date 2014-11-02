@@ -1,5 +1,5 @@
 (function() {
-  var autocompletes, channels, initChans, initialJoin, joinChannel, loadAutoCompletes, numChannels, sideBar, sideBarFocus, typingArea, users;
+  var activeChannel, autocompletes, handleLinkClick, initChans, joinChannel, loadAutoCompletes, numChannels, setActiveChannel, sideBar, sideBarFocus, typingArea, users;
 
   typingArea = $("textarea");
 
@@ -15,18 +15,21 @@
 
   users = [];
 
-  channels = [];
+  activeChannel = "";
 
   window.ircapi_sendMessage = function(str) {};
 
-  $("#sidebar a").click(function(evt) {
-    var channel;
-    evt.preventDefault();
-    channel = this.hash.substring(1);
-    window.location.hash = this.hash;
-    $(".ticked").removeClasss(".ticked");
-    return this.addClass(".ticked");
-  });
+  setActiveChannel = function(chan) {
+    activeChannel = chan;
+    window.location.hash = "#" + chan;
+    $(".ticked").removeClass("ticked");
+    return $("#sidebar a[href='#" + chan + "']").addClass("ticked");
+  };
+
+  handleLinkClick = function(evt) {
+    setActiveChannel(this.hash.substring(1));
+    return evt.preventDefault();
+  };
 
   joinChannel = function(channame) {
     return $.ajax("./api/join/" + channame + "/", {
@@ -36,8 +39,13 @@
         return console.log("error in getting userlist: ", errorThrown);
       },
       success: function(data, textStatus, jqXHR) {
-        $("#sidebar #publicChannels").after($("<a href=\"#" + channame + "\">#" + channame + "</a>"));
-        return users.push(data);
+        if (data["private"]) {
+          $("<a href=\"#" + channame + "\">#" + channame + "</a>").insertAfter($("#sidebar #privateChannels")).click(handleLinkClick);
+          setActiveChannel(channame);
+        } else {
+          $("<a href=\"#" + channame + "\">#" + channame + "</a>").insertAfter($("#sidebar #publicChannels")).click(handleLinkClick);
+        }
+        return users.push(data["users"]);
       }
     });
   };
@@ -50,7 +58,7 @@
         return console.log(textStatus);
       },
       success: function(data, textStatus, jqXHR) {
-        var c, channel, _i, _len, _ref;
+        var c, _i, _len, _ref;
         console.log(data);
         loadAutoCompletes();
         _ref = initChans.reverse();
@@ -58,26 +66,10 @@
           c = _ref[_i];
           joinChannel(c);
         }
-        return channel = channels[0];
+        return initChans.reverse();
       }
     });
   });
-
-  initialJoin = function() {
-    console.log("./api/userlist/" + channel + "/");
-    joinChannel();
-    return $.ajax("./api/join/" + channel + "/", {
-      type: "GET",
-      dataType: "json",
-      error: function(jqXHR, textStatus, errorThrown) {
-        return console.log("error in getting userlist: ", errorThrown);
-      },
-      success: function(data, textStatus, jqXHR) {
-        this.users = data;
-        return console.log(this.users);
-      }
-    });
-  };
 
   loadAutoCompletes = function() {
     return $.ajax("./api/autocompletes", {

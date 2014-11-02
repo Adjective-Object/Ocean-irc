@@ -99,6 +99,7 @@ $sidebar-width: 200px;
         margin-top: 10px;
     }
     a {
+        position:relative;
         padding-left: 13%;
         text-decoration: none;
         display: block;
@@ -126,13 +127,26 @@ $sidebar-width: 200px;
         outline: none;
     }
 
-
+    // the triangle
+    a.ticked:after{
+        content:"";
+        border:6px solid transparent;
+        border-right: 12px solid #d2e7ee;
+        display:block;
+        width:0;
+        height:0;
+        position:absolute;
+        right:0;
+        top:50%;
+        margin-top:-6px;
+        z-index: 6;
+    }
 
     &>header, &>a{ width: $sidebar-width;}
 
 }
 
-#textscroll {
+#rightbar {
     @include transition(margin-left, 0.3s, ease-in-out);
 
     margin-left: $sidebar-width;
@@ -158,7 +172,7 @@ body.sidebarhidden{
     #sidebar{
         width: 0;
     }
-    #textscroll{
+    #rightbar{
         margin-left:0;
     }
 }

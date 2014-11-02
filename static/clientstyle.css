@@ -78,6 +78,7 @@ body, html {
   #sidebar a:first-child {
     margin-top: 10px; }
   #sidebar a {
+    position: relative;
     padding-left: 13%;
     text-decoration: none;
     display: block;
@@ -99,10 +100,22 @@ body, html {
     border-left-style: solid; }
   #sidebar a:focus {
     outline: none; }
+  #sidebar a.ticked:after {
+    content: "";
+    border: 6px solid transparent;
+    border-right: 12px solid #d2e7ee;
+    display: block;
+    width: 0;
+    height: 0;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    margin-top: -6px;
+    z-index: 6; }
   #sidebar > header, #sidebar > a {
     width: 200px; }
 
-#textscroll {
+#rightbar {
   -webkit-transition: margin-left 0.3s ease-in-out;
   -moz-transition: margin-left 0.3s ease-in-out;
   -ms-transition: margin-left 0.3s ease-in-out;
@@ -127,7 +140,7 @@ textarea {
 
 body.sidebarhidden #sidebar {
   width: 0; }
-body.sidebarhidden #textscroll {
+body.sidebarhidden #rightbar {
   margin-left: 0; }
 
 /*# sourceMappingURL=clientstyle.css.map */
