@@ -188,7 +188,7 @@ body, html {
   background-origin: content-box; }
 
 .post {
-  padding: 20px;
+  margin: 20px;
   font-size: 12px; }
   .post img {
     float: left;
@@ -201,6 +201,14 @@ body, html {
     display: inline;
     margin-right: 8px; }
   .post .body {
+    display: block; }
+
+.post.collapsed {
+  margin: 0px;
+  font-size: 12px; }
+  .post.collapsed img, .post.collapsed .name, .post.collapsed .timestamp {
+    display: none; }
+  .post.collapsed .body {
     display: block; }
 
 #topic {

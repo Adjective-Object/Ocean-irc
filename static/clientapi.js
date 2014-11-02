@@ -40,6 +40,7 @@
     $("#sidebar a[href='#" + chan + "']").addClass("ticked");
     $("#topic").text(("#" + chan + " :: ") + channels["#" + chan]["topic"]);
     $("#chatcontents").empty();
+    console.log(chan, messages);
     populateChatBuffer(messages["#" + chan]);
     return $("#sidebar a[href='#" + chan + "']").removeAttr("data-notif");
   };
@@ -74,12 +75,9 @@
         }
         messages["#" + channame] = [];
         channels["#" + channame] = data;
-        console.log(channels);
-        console.log(window.location.hash, "#" + channame);
         if (window.location.hash === ("#" + channame)) {
-          console.log("ACTIV!!");
           return setActiveChannel(channame);
-        } else if ((window.location.hash = void 0 && initChans.indexOf(channame) === 0)) {
+        } else if (window.location.hash === void 0 && initChans.indexOf(channame) === 0) {
           return setActiveChannel(channame);
         }
       }
@@ -95,6 +93,10 @@
     obj = $(".body", n);
     obj.text(msg['msg']).html();
     obj.html(obj.html().replace(/\n/g, '<br/>'));
+    if ($(c).last().attr("sender") === $(n).attr("sender")) {
+      console.log("collapsing post");
+      $(n).addClass("collapsed");
+    }
     c.append(n);
     if (scroll) {
       return c.scrollTop(c.get(0).scrollHeight);
@@ -110,7 +112,6 @@
       },
       success: function(data, textStatus, jqXHR) {
         var dval, ln, msg, _i, _len, _results;
-        console.log(data);
         _results = [];
         for (_i = 0, _len = data.length; _i < _len; _i++) {
           msg = data[_i];
