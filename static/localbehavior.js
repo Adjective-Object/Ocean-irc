@@ -45,6 +45,7 @@
       }
     });
     typingArea.keydown(function(e) {
+      var sideBarElems, tofocus;
       e.stopPropagation();
       switch (e.keyCode) {
         case BACKTICK:
@@ -57,6 +58,9 @@
         case TAB:
           e.preventDefault();
           $("body").removeClass("sidebarhidden");
+          tofocus = $("#sidebar a.ticked");
+          sideBarElems = $("#sidebar a");
+          sideBarFocus = sideBarElems.index(tofocus);
           return shiftSidebarFocus(0);
         case ENTER:
           if (!e.shiftKey) {
@@ -80,7 +84,7 @@
           $("body").addClass("sidebarhidden");
           return typingArea.focus();
         case TAB:
-          return shiftSidebarFocus(1);
+          return typingArea.focus();
         case ENTER:
           return $(":focus").click();
         case UP:

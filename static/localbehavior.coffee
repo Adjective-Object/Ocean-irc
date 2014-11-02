@@ -49,6 +49,10 @@ $(document).ready ->
 			when TAB  #TAB
 				e.preventDefault();
 				$("body").removeClass("sidebarhidden");
+
+				tofocus = $("#sidebar a.ticked");
+				sideBarElems = $("#sidebar a")
+				sideBarFocus = sideBarElems.index(tofocus);
 				shiftSidebarFocus(0);
 			when ENTER #ENTER
 				if (! e.shiftKey)
@@ -72,7 +76,7 @@ $(document).ready ->
 				$("body").addClass("sidebarhidden");
 				typingArea.focus();
 			when TAB
-				shiftSidebarFocus(1);
+				typingArea.focus();
 			when ENTER
 				$(":focus").click();
 			when UP, K
