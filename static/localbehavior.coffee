@@ -25,7 +25,6 @@ shiftSidebarFocus = (index) ->
 	$("#sidebar a:nth-of-type("+(sideBarFocus+1)+")").focus()
 
 
-
 # On Document Ready
 $(document).ready ->
 
@@ -37,8 +36,6 @@ $(document).ready ->
 			when ENTER #ENTER
 				typingArea.focus();
 				e.preventDefault();
-			else
-				console.log("uk body", e.keyCode);
 
 	#keypresses on the input box
 	typingArea.keydown (e)->
@@ -56,8 +53,10 @@ $(document).ready ->
 			when ENTER #ENTER
 				if (! e.shiftKey)
 					e.preventDefault();
-					window.ircapi_sendMessage(typingArea.text);
-					$(typingArea).val("");
+					if(typingArea.val() != "")
+						window.ircapi_sendMessage(typingArea.val());
+						$(typingArea).val("");
+					
 			when ESC #ESC
 				#switch focus from text bar to the sidebar
 				$("body").removeClass("sidebarhidden");
@@ -76,7 +75,6 @@ $(document).ready ->
 				shiftSidebarFocus(1);
 			when ENTER
 				$(":focus").click();
-				typingArea.focus();
 			when UP, K
 				shiftSidebarFocus(-1);
 			when DOWN, J

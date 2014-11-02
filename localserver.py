@@ -1,7 +1,7 @@
 from flask import Flask
 from ocean import *
 import unicodedata
-import json
+import json, random
 app = Flask(__name__)
 
 connected = False
@@ -44,6 +44,7 @@ def getUserList(channel):
     #fake user list
     return json.dumps(
         {   "public": True,
+            "topic": "WHERE WIFI GOES TO DIE",
             "users": [
                 {   "realname": "PJ Rosa",
                     "nick": "de-mote"
@@ -88,16 +89,20 @@ def getAutoCompletes():
 def pushMessage():
     return "unimplemented"
 
+triggered = False
 @app.route("/api/getMessages/")
 def getMessages():
-    return json.dumps([
-        {   "channel": "#general",
-            "timestamp": 0,
-            "usr": "fakeman",
-            "msg": "TEMP MESSAGE"
-        }
-    ])
+    if random.random() < 0.5:
+        return "[]"
+    else:
+        return json.dumps([
+            {   "channel": "#general",
+                "timestamp": 0,
+                "usr": "fakeman",
+                "msg": "TEMP MESSAGE"
+            }
+        ])
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
