@@ -52,7 +52,7 @@ body, html {
     font-family: "prox-semibold";
     text-transform: uppercase;
     letter-spacing: 3px;
-    border-top-color: #fff;
+    border-top-color: rgba(255, 255, 255, 0.3);
     border-top-style: solid;
     border-top-width: 1px;
     font-size: 10px;
@@ -148,3 +148,5 @@ body.sidebarhidden #sidebar {
   width: 0; }
 body.sidebarhidden #textscroll {
   margin-left: 0; }
+
+/*# sourceMappingURL=clientstyle.css.map */
