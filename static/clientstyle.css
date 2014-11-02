@@ -71,9 +71,16 @@ body, html {
     font-size: .7em;
     text-transform: uppercase;
     letter-spacing: 3px; }
+  #sidebar header img {
+    width: 20px;
+    margin-bottom: -5px;
+    margin-top: 10px;
+    margin-left: 25px;
+    margin-right: 10px; }
   #sidebar a:first-child {
     margin-top: 10px; }
   #sidebar a {
+    position: relative;
     padding-left: 13%;
     text-decoration: none;
     display: block;
@@ -83,22 +90,41 @@ body, html {
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 3px;
-    transition: background .2s ease-in-out,  all .2s;
+    transition: background .2s ease-in-out, all .2s;
     border-left-width: 0;
     border-left-style: solid; }
   #sidebar a.selected {
     background: #6e99ab; }
-  #sidebar a:hover, #sidebar a:focus {
+  #sidebar a:hover, #sidebar a:focus, #sidebar:not(.containsFocus) a.ticked {
     background-color: #6e99ab;
     border-color: #fff;
     border-left-width: 7px;
     border-left-style: solid; }
   #sidebar a:focus {
     outline: none; }
+  #sidebar a:after {
+    content: "";
+    border: 6px solid transparent;
+    border-right: 12px solid #d2e7ee;
+    display: block;
+    width: 0;
+    height: 0;
+    position: absolute;
+    right: -12px;
+    top: 50%;
+    margin-top: -6px;
+    z-index: 6;
+    -webkit-transition: right 0.3s ease-in-out;
+    -moz-transition: right 0.3s ease-in-out;
+    -ms-transition: right 0.3s ease-in-out;
+    -o-transition: right 0.3s ease-in-out;
+    transition: right 0.3s ease-in-out; }
+  #sidebar a.ticked:after {
+    right: 0; }
   #sidebar > header, #sidebar > a {
     width: 220px; }
 
-#textscroll {
+#rightbar {
   -webkit-transition: margin-left 0.3s ease-in-out;
   -moz-transition: margin-left 0.3s ease-in-out;
   -ms-transition: margin-left 0.3s ease-in-out;
@@ -132,6 +158,7 @@ body, html {
   float: right; }
 
 textarea {
+  outline: none !important;
   border: 0;
   border-top-width: 8px;
   border-top-color: #d2e7ee;
@@ -140,11 +167,12 @@ textarea {
   bottom: 0px;
   resize: none;
   width: 100%;
-  padding: 15px;
-  height: 5%;
-  font-family: "prox-reg"; }
+  padding: 0.5em;
+  height: 5em;
+  font-family: "prox-reg";
+  overflow-y: auto; }
 
 body.sidebarhidden #sidebar {
   width: 0; }
-body.sidebarhidden #textscroll {
+body.sidebarhidden #rightbar {
   margin-left: 0; }

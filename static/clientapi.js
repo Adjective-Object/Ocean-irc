@@ -1,21 +1,5 @@
 (function() {
-  var BACKTICK, DOWN, ENTER, ESC, J, K, TAB, UP, autocompletes, loadAutoCompletes, loadUsers, numChannels, sendMessage, shiftSidebarFocus, sideBar, sideBarFocus, typingArea, users;
-
-  ENTER = 13;
-
-  TAB = 9;
-
-  ESC = 27;
-
-  BACKTICK = 192;
-
-  UP = 38;
-
-  DOWN = 40;
-
-  J = 74;
-
-  K = 75;
+  var activeChannel, autocompletes, fetchMessages, handleLinkClick, initChans, joinChannel, loadAutoCompletes, messages, numChannels, setActiveChannel, sideBar, sideBarFocus, typingArea, users;
 
   typingArea = $("textarea");
 
@@ -25,99 +9,79 @@
 
   numChannels = $("#sidebar a").length;
 
+  initChans = ["general", "mabois", "knurds"];
+
+  messages = {};
+
   autocompletes = [];
 
   users = [];
 
-  loadUsers = function() {
-    return $.ajax("./api/userlist", {
+  activeChannel = "";
+
+  window.ircapi_sendMessage = function(str) {};
+
+  setActiveChannel = function(chan) {
+    activeChannel = chan;
+    window.location.hash = "#" + chan;
+    $(".ticked").removeClass("ticked");
+    return $("#sidebar a[href='#" + chan + "']").addClass("ticked");
+  };
+
+  handleLinkClick = function(evt) {
+    setActiveChannel(this.hash.substring(1));
+    return evt.preventDefault();
+  };
+
+  joinChannel = function(channame) {
+    return $.ajax("./api/join/" + channame + "/", {
       type: "GET",
       dataType: "json",
       error: function(jqXHR, textStatus, errorThrown) {
-        return console.log("error in getting userlist: ", textStatus);
+        return console.log("error in getting userlist: ", errorThrown);
       },
       success: function(data, textStatus, jqXHR) {
-        this.users = data;
-        return console.log(this.users);
+        if (data["private"]) {
+          $("<a href=\"#" + channame + "\">#" + channame + "</a>").insertAfter($("#sidebar #privateChannels")).click(handleLinkClick);
+        } else {
+          $("<a href=\"#" + channame + "\">#" + channame + "</a>").insertAfter($("#sidebar #publicChannels")).click(handleLinkClick);
+        }
+        if (window.location.hash === void 0) {
+          setActiveChannel(channame);
+        } else if (window.location.hash === ("#" + channame)) {
+          setActiveChannel(channame);
+        }
+        messages[channame] = [];
+        return users.push(data["users"]);
       }
     });
   };
 
-  loadAutoCompletes = function() {
-    return $.ajax("./api/autocompletes", {
+  fetchMessages = function() {
+    return $.ajax("./api/getMessages", {
       type: "GET",
       dataType: "json",
       error: function(jqXHR, textStatus, errorThrown) {
-        return console.log("error in getting autocompletes: ", textStatus);
+        return console.log("error in getting userlist: ", errorThrown);
       },
       success: function(data, textStatus, jqXHR) {
-        this.autocompletes = data;
-        return console.log(this.autocompletes);
+        var msg, _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = data.length; _i < _len; _i++) {
+          msg = data[_i];
+          messages[msg["channel"]].push(msg);
+          if (msg["channel"] === activeChannel) {
+            _results.push(buildMsg(msg));
+          } else {
+            _results.push(void 0);
+          }
+        }
+        return _results;
       }
     });
-  };
-
-  sendMessage = function(str) {};
-
-  shiftSidebarFocus = function(index) {
-    sideBarFocus = (numChannels + sideBarFocus + index) % numChannels;
-    return $("#sidebar a:nth-of-type(" + (sideBarFocus + 1) + ")").focus();
   };
 
   $(document).ready(function() {
-    typingArea.autosize();
-    $(document).keydown(function(e) {
-      switch (e.keyCode) {
-        case BACKTICK:
-          return $("body").toggleClass("sidebarhidden");
-        case ENTER:
-          return typingArea.focu1s();
-        default:
-          return console.log("uk body", e.keyCode);
-      }
-    });
-    typingArea.keydown(function(e) {
-      e.stopPropagation();
-      switch (e.keyCode) {
-        case BACKTICK:
-          $("body").toggleClass("sidebarhidden");
-          return shiftSidebarFocus(0);
-        case TAB:
-          e.preventDefault();
-          $("body").removeClass("sidebarhidden");
-          shiftSidebarFocus(0);
-          return console.log("tab");
-        case ENTER:
-          e.preventDefault();
-          sendMessage(typingArea.text);
-          return $(typingArea).val("");
-        case ESC:
-          console.log("esc");
-          $("body").removeClass("sidebarhidden");
-          return shiftSidebarFocus(0);
-        default:
-          return console.log("uk textbox", e.keyCode);
-      }
-    });
-    sideBar.keydown(function(e) {
-      e.stopPropagation();
-      e.preventDefault;
-      switch (e.keyCode) {
-        case TAB:
-          e.preventDefault();
-          return shiftSidebarFocus(1);
-        case ENTER:
-          return sideBar.focus();
-        case UP:
-        case K:
-          return shiftSidebarFocus(-1);
-        case DOWN:
-        case J:
-          return shiftSidebarFocus(1);
-        default:
-          return console.log("uk inputbox", e.keyCode);
-      }
-    });
     return $.ajax("./api/connect/104.236.63.94/oceanman/", {
       type: "GET",
       dataType: "html",
@@ -125,11 +89,32 @@
         return console.log(textStatus);
       },
       success: function(data, textStatus, jqXHR) {
+        var c, _i, _len, _ref;
         console.log(data);
-        loadUsers();
-        return loadAutoCompletes();
+        loadAutoCompletes();
+        _ref = initChans.reverse();
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          c = _ref[_i];
+          joinChannel(c);
+        }
+        initChans.reverse();
+        return setInterval(fetchMessages, 100);
       }
     });
   });
+
+  loadAutoCompletes = function() {
+    return $.ajax("./api/autocompletes", {
+      type: "GET",
+      dataType: "json",
+      error: function(jqXHR, textStatus, errorThrown) {
+        return console.log("error in getting autocompletes: ", errorThrown);
+      },
+      success: function(data, textStatus, jqXHR) {
+        this.autocompletes = data;
+        return console.log(this.autocompletes);
+      }
+    });
+  };
 
 }).call(this);

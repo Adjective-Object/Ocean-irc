@@ -39,35 +39,36 @@ def handleConnect(hostname, nick, port=6667):
     return "not implemented"
 
 
-@app.route("/api/userlist")
-def getUserList():
+@app.route("/api/join/<channel>/")
+def getUserList(channel):
     #fake user list
     return json.dumps(
-        [
-            {   "realname": "PJ Rosa",
-                "nick": "de-mote"
-            },
-            {   "realname": "Jeff Tao",
-                "nick": "jtao"
-            },
-            {   "realname": "Nolan Lum",
-                "nick": "nolm"
-            },
-            {   "realname": "God Damn Billy",
-                "nick": "insectMechanics"
-            },
-            {   "realname": "insectMechanics",
-                "nick": "God Damn Billy"
-            },
-            {   "realname": "PRo Koder",
-                "nick": "PRoKoder"
-            }
-        ])
+        {   "public": True,
+            "users": [
+                {   "realname": "PJ Rosa",
+                    "nick": "de-mote"
+                },
+                {   "realname": "Jeff Tao",
+                    "nick": "jtao"
+                },
+                {   "realname": "Nolan Lum",
+                    "nick": "nolm"
+                },
+                {   "realname": "God Damn Billy",
+                    "nick": "insectMechanics"
+                },
+                {   "realname": "insectMechanics",
+                    "nick": "God Damn Billy"
+                },
+                {   "realname": "PRo Koder",
+                    "nick": "PRoKoder"
+                }
+            ]})
 
 #handles a character being typed
-@app.route("/api/autocompletes")
+@app.route("/api/autocompletes/")
 def getAutoCompletes():
-    s = json.dumps([
+    return json.dumps([
         {   "open": "/",
             "close": " ",
             "completes": {
@@ -81,17 +82,22 @@ def getAutoCompletes():
             }
         }
     ])
-    print s
-    return s
 
 #string 
-@app.route("/api/pushMessage/")
+@app.route("/api/pushMessage/", methods=['PUSH'])
 def pushMessage():
     return "unimplemented"
 
-@app.route("/api/getMessages/<timestamp>")
+@app.route("/api/getMessages/")
 def getMessages():
-    return "unimplemented"
+    return json.dumps([
+        {   "channel": "#general",
+            "timestamp": 0,
+            "usr": "fakeman",
+            "msg": "TEMP MESSAGE"
+        }
+    ])
+
 
 if __name__ == "__main__":
     app.run(debug=True)

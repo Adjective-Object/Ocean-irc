@@ -1,110 +1,68 @@
-#keycode defs
-ENTER = 13;
-TAB = 9
-ESC = 27
-BACKTICK = 192
-
-UP = 38
-DOWN = 40
-J = 74
-K = 75
-
 #special elems of the text
 typingArea = $("textarea");
 sideBar = $("#sidebar");
 sideBarFocus = 0;
 numChannels = $("#sidebar a").length
 
-#data pulled fro, the server
+#init args
+initChans = ["general", "mabois", "knurds"];
+messages = {};
+
+#data pulled from the server
 autocompletes = [];
 users = [];
+activeChannel = ""
 
 
-loadUsers = ->
-	$.ajax "./api/userlist",
-		type: "GET"
-		dataType: "json"
-		error: (jqXHR, textStatus, errorThrown) ->
-			console.log("error in getting userlist: ", textStatus)
-		success: (data, textStatus, jqXHR) ->
-			this.users = data
-			console.log(this.users)
-
-loadAutoCompletes = ->
-	$.ajax "./api/autocompletes",
-		type: "GET"
-		dataType: "json"
-		error: (jqXHR, textStatus, errorThrown) ->
-			console.log("error in getting autocompletes: ", textStatus)
-		success: (data, textStatus, jqXHR) ->
-			this.autocompletes = data
-			console.log(this.autocompletes)
-
-sendMessage = (str) ->
+window.ircapi_sendMessage = (str) ->
 	return
 
-shiftSidebarFocus = (index) ->
-	sideBarFocus = (numChannels + sideBarFocus + index) % numChannels
-	$("#sidebar a:nth-of-type("+(sideBarFocus+1)+")").focus()
+setActiveChannel = (chan) ->
+	activeChannel = chan;
+	window.location.hash = "##{chan}";
+	$(".ticked").removeClass("ticked");
+	$("#sidebar a[href='##{chan}']").addClass("ticked");
+	
+handleLinkClick = (evt) ->
+	setActiveChannel(this.hash.substring(1));
+	evt.preventDefault();
 
+joinChannel = (channame) ->
+	$.ajax ("./api/join/"+channame+"/"),
+		type: "GET"
+		dataType: "json"
+		error: (jqXHR, textStatus, errorThrown) ->
+			console.log("error in getting userlist: ", errorThrown)
+		success: (data, textStatus, jqXHR) ->
+			if (data["private"])
+				$("<a href=\"##{channame}\">##{channame}</a>").insertAfter(
+					$("#sidebar #privateChannels")).click(handleLinkClick);
+			else
+				$("<a href=\"##{channame}\">##{channame}</a>").insertAfter(
+					$("#sidebar #publicChannels")).click(handleLinkClick);
+
+			if (window.location.hash == undefined)
+				setActiveChannel(channame);	
+			else if (window.location.hash == "##{channame}")
+				setActiveChannel(channame)
+
+			messages[channame] = [];
+			users.push(data["users"])
+
+fetchMessages = ->
+	$.ajax ("./api/getMessages"),
+		type: "GET"
+		dataType: "json"
+		error: (jqXHR, textStatus, errorThrown) ->
+			console.log("error in getting userlist: ", errorThrown)
+		success: (data, textStatus, jqXHR) ->
+			for msg in data
+				messages[msg["channel"]].push(msg)
+				if (msg["channel"] == activeChannel)
+					buildMsg(msg)
 
 # On Document Ready
 $(document).ready ->
-	typingArea.autosize();
-
-	#keypresses that make it to the top level
-	$(document).keydown (e) -> 
-		switch e.keyCode
-			when BACKTICK
-				$("body").toggleClass("sidebarhidden");
-			when ENTER #ENTER
-				typingArea.focu1s();
-			else
-				console.log("uk body", e.keyCode);
-
-	#keypresses on the input box
-	typingArea.keydown (e)->
-		e.stopPropagation();
-		switch e.keyCode
-			when BACKTICK
-				$("body").toggleClass("sidebarhidden");
-				shiftSidebarFocus(0);
-			when TAB  #TAB
-				e.preventDefault();
-				$("body").removeClass("sidebarhidden");
-				shiftSidebarFocus(0);
-				console.log("tab")
-			when ENTER #ENTER
-				e.preventDefault();
-				sendMessage(typingArea.text);
-				$(typingArea).val("");
-			when ESC #ESC
-				console.log("esc");
-				#switch focus from text bar to the sidebar
-				$("body").removeClass("sidebarhidden");
-				shiftSidebarFocus(0)
-			else
-				console.log("uk textbox", e.keyCode);
-
-
-	#navigating in the sidebar
-	sideBar.keydown (e) -> 
-		e.stopPropagation();
-		e.preventDefault
-		switch e.keyCode
-			when TAB
-				e.preventDefault();
-				shiftSidebarFocus(1);
-			when ENTER
-				#TODO loading the right pane
-				sideBar.focus();
-			when UP, K
-				shiftSidebarFocus(-1);
-			when DOWN, J
-				shiftSidebarFocus(1);
-			else
-				console.log("uk inputbox", e.keyCode);
-
 	#sending a "connect to server" message on connect
 	$.ajax "./api/connect/104.236.63.94/oceanman/", 
 		type: "GET"
@@ -113,5 +71,19 @@ $(document).ready ->
         	console.log(textStatus);
 		success: (data, textStatus, jqXHR) ->
 			console.log(data);
-			loadUsers();
+			#load users and autocompletes when connected
 			loadAutoCompletes();
+			(joinChannel(c) for c in initChans.reverse())
+			initChans.reverse();
+
+			setInterval(fetchMessages, 100);
+
+loadAutoCompletes = ->
+	$.ajax "./api/autocompletes",
+		type: "GET"
+		dataType: "json"
+		error: (jqXHR, textStatus, errorThrown) ->
+			console.log("error in getting autocompletes: ", errorThrown)
+		success: (data, textStatus, jqXHR) ->
+			this.autocompletes = data
+			console.log(this.autocompletes)

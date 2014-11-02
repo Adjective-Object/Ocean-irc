@@ -7,28 +7,36 @@
 </head>
 <body>
 <nav id="sidebar">
-	<header><img style="width: 30px; margin-bottom: -5px; padding-right: 4px;" src="./chat_buble-03.svg">Chats</header>
-	<a href="#general">#general</a>
-	<a href="#mabois">#mabois</a>
-	<a href="#turds">#turds</a>
-	<a href="#knurds">#knurds</a>
-	<header><img style="width: 20px; margin-bottom: -5px; margin-top: 10px; margin-left: 25px; margin-right: 10px;" src="./mess_icon-05.svg">Private Channels</header>
-	<a href="#spoopy">#spoopy</a>
-	<a href="#secret">#secret</a>
-	<header><img style="width: 20px; margin-bottom: -5px; margin-top: 10px; margin-left: 25px; margin-right: 10px; " src="./mess_icon-04.svg">Direct Messages</header>
-	<a href="#@user">user</a>
-	<a href="#@another">another</a>
+	<header id="publicChannels">
+		<img src="./static/chat_buble-03.svg">Chats
+	</header>
+	
+	<header id="privateChannels">
+		<img src="./static/mess_icon-05.svg">Private Channels
+	</header>
 </nav>
 
-<section id="textscroll">
-    <header id="topic">#general :: where wifi goes to die <span id="usercount">20</span></header>
+<section id="rightbar">
+
+	<header id="topic">#general :: where wifi goes to die <span id="usercount">20</span></header>
+
+	<section id="chatcontents">
+		<section class="post">
+			<img src="./static/imgdump/placeholder.jpg"/>
+			<section class="name">userName</section>
+			<section class="post">
+				THIS IS NOT MADE OF DIVS
+			</section>
+		</section>
+	</section>
+
     <section id="in">
             <textarea id="inputbox"></textarea>
 	</section>
 </section>
     
 </body>
-<script type="text/javascript" src="./jquery-2.1.1.js"></script>
-<script type="text/javascript" src="./jquery.autosize.js"></script>
-<script type="text/javascript" src="./clientapi.js"></script>
+<script type="text/javascript" src="./static/jquery-2.1.1.js"></script>
+<script type="text/javascript" src="./static/clientapi.js"></script>
+<script type="text/javascript" src="./static/localbehavior.js"></script>
 </html>
