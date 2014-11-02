@@ -26,6 +26,8 @@ window.ircapi_sendMessage = (message) ->
     buildMsg(d);
     messages["##{activeChannel}"].push(d);
 
+    pushMessageToServer(message, activeChannel)
+
 setActiveChannel = (chan) ->
     activeChannel = chan;
     window.location.hash = "##{chan}";
@@ -53,7 +55,7 @@ joinChannel = (channame) ->
         type: "GET"
         dataType: "json"
         error: (jqXHR, textStatus, errorThrown) ->
-            console.log("error in getting userlist: ", errorThrown)
+            console.log("error in joining channel: ", errorThrown)
         success: (data, textStatus, jqXHR) ->
             if (data["private"])
                 $("<a href=\"##{channame}\">##{channame}</a>").insertAfter(
@@ -94,7 +96,7 @@ fetchMessages = ->
         type: "GET"
         dataType: "json"
         error: (jqXHR, textStatus, errorThrown) ->
-            console.log("error in getting userlist: ", errorThrown)
+            console.log("error in getting messages: ", errorThrown)
         success: (data, textStatus, jqXHR) ->
             for msg in data
                 messages[msg["channel"]].push(msg)
@@ -107,6 +109,17 @@ fetchMessages = ->
                         ln.attr("data-notif", 1);
                     else
                         ln.attr("data-notif", parseInt(dval)+1);
+
+pushMessageToServer = (message, channel) ->
+    $.ajax ("./api/pushMessage/#{channel}"),
+        type: "POST"
+        dataType: "json"
+        data: {"message": message}
+        error: (jqXHR, textStatus, errorThrown) ->
+            console.log("error in getting messages: ", errorThrown)
+        success: (data, textStatus, jqXHR) ->
+            console.log("posted, cool");
+
 
 # On Document Ready
 $(document).ready ->
