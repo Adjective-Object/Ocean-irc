@@ -2,7 +2,12 @@ from flask import Flask
 from ocean import *
 import unicodedata
 import json, random
+import threading
+import logging
 app = Flask(__name__)
+
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 connected = False
 client = OceanClient()
@@ -21,12 +26,12 @@ def nouni(str):
 
 @app.route("/")
 def rootRoute():
-    print
     return send_static_file("./static/client.html")
 
 @app.route("/api/connect/<hostname>/<username>/<nick>/<int:port>")
+@app.route("/api/connect/<hostname>/<username>/<nick>/<realname>/<int:port>")
 @app.route("/api/connect/<hostname>/<username>/<nick>/")
-def handleConnect(hostname, username, nick, port=6667):
+def handleConnect(hostname, username, nick, realname="Shia Labeouf", port=6667):
     """
     global connected
     if not connected:
@@ -36,16 +41,28 @@ def handleConnect(hostname, username, nick, port=6667):
 
     return "already connected..."
     """
+    print "handling connect..."
+    # Run IRC client in a separate thread
+    client.register(username, realname, nick)
+    client.connect(hostname)
+    client_thread = threading.Thread(target=client.run)
+    client_thread.daemon = True
+    client_thread.start()
+    print "client thread started. %s %s %s" % (username, realname, nick)
     #information about the user you just logged in as
     return json.dumps({
-        "username": "oceanman",
-        "realname": "Anon",
-        "nick": "nick"})
+        "username": username,
+        "realname": realname,
+        "nick": nick})
 
 
 @app.route("/api/join/<channel>/")
 def getUserList(channel):
-    #fake user list
+    client.send('JOIN %s' % channel)
+    """
+    while not channel in client.channels:
+        continue
+    """
     return json.dumps(
         {   "public": True,
             "topic": "WHERE WIFI GOES TO DIE",
@@ -89,13 +106,19 @@ def getAutoCompletes():
     ])
 
 #string 
-@app.route("/api/pushMessage/", methods=['PUSH'])
+@app.route("/api/pushMessage/", methods=['POST'])
 def pushMessage():
     return "unimplemented"
 
 triggered = False
 @app.route("/api/getMessages/")
 def getMessages():
+    out = client.read_outbuf()
+    if len(out) > 0:
+        print out
+    client.clear_outbuf()
+    return json.dumps(out)
+    """
     if random.random() < 0.5:
         return "[]"
     else:
@@ -106,6 +129,7 @@ def getMessages():
                 "msg": "TEMP MESSAGE"
             }
         ])
+    """
 
 
 if __name__ == "__main__":

@@ -136,7 +136,7 @@ class OceanClient():
         return self.outbuf
 
     def clear_outbuf(self):
-        self.outbuf = {}
+        self.outbuf = []
 
     def run(self):
         input_thread = threading.Thread(target=self.read_send_loop)
@@ -159,16 +159,16 @@ class OceanClient():
                     if '#' in line[2]:
                         self.outbuf.append({
                             u'channel': self.get_recipient(line),
-                            u'sender':  self.get_sender(line),
-                            u'message': ' '.join(line[3:]).strip(),
+                            u'usr':  self.get_sender(line),
+                            u'msg': ' '.join(line[3:]).strip(),
                             u'timestamp': str(time.time()).encode('UTF-8')
                         })
                     # Private Messages
                     if line[2] == self.nickname:
                         self.outbuf.append({
                             u'channel': self.get_sender(line),
-                            u'sender':  self.get_sender(line),
-                            u'message': ' '.join(line[3:]).strip(),
+                            u'usr':  self.get_sender(line),
+                            u'msg': ' '.join(line[3:]).strip(),
                             u'timestamp': str(time.time()).encode('UTF-8')
                         })
 
