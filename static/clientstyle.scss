@@ -177,7 +177,19 @@ $sidebar-width: 220px;
     border-left-style: solid;
     padding-bottom: 20%;
 }
-    #topic {
+
+#chatcontents {
+    overflow-y: auto;
+    position:absolute;
+    left:0;
+    right:0;
+    top:40px;
+    bottom:67px;
+}
+
+#topic {
+        position:absolute;
+        top:0;
         height: 40px;
         line-height: 40px;
         width: 100%;
@@ -193,6 +205,9 @@ $sidebar-width: 220px;
         }
 
     textarea {
+        position:absolute;
+        bottom:0;
+
         outline: none !important;
         border: 0;
         border-top-width: 8px;

@@ -91,7 +91,7 @@ def pushMessage():
 triggered = False
 @app.route("/api/getMessages/")
 def getMessages():
-    if random.random() < 0.8:
+    if random.random() < 0.5:
         return "[]"
     else:
         return json.dumps([
