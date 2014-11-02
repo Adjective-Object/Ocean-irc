@@ -57,41 +57,23 @@ def handleConnect(hostname, username, nick, realname="Shia Labeouf", port=6667):
         "realname": realname,
         "nick": nick})
 
+imgs = ["./static/imgdump/user-icon-09.svg",
+        "./static/imgdump/user-icon-10.svg",
+        "./static/imgdump/user-icon-11.svg"]
 
 @app.route("/api/join/<channel>/")
 def getUserList(channel):
     channel = '#' + channel
     client.send('JOIN %s' % channel)
     while not channel in client.get_channels():
-        print channel
-        print client.get_channels()
-    print "successfully joined #%s" % channel
-    return json.dumps(client.get_channels()[channel])
+        continue
+    chandata = client.get_channels()[channel]
     """
-    return json.dumps(
-        {   "public": True,
-            "topic": "WHERE WIFI GOES TO DIE",
-            "users": [
-                {   "realname": "PJ Rosa",
-                    "nick": "de-mote"
-                },
-                {   "realname": "Jeff Tao",
-                    "nick": "jtao"
-                },
-                {   "realname": "Nolan Lum",
-                    "nick": "nolm"
-                },
-                {   "realname": "God Damn Billy",
-                    "nick": "insectMechanics"
-                },
-                {   "realname": "insectMechanics",
-                    "nick": "God Damn Billy"
-                },
-                {   "realname": "PRo Koder",
-                    "nick": "PRoKoder"
-                }
-            ]})
+    for user in chandata:
+        user['image'] = random.choice(imgs)
+    print chandata
     """
+    return json.dumps(chandata)
 
 #handles a character being typed
 @app.route("/api/autocompletes/")
