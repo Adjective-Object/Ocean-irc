@@ -60,10 +60,13 @@ def handleConnect(hostname, username, nick, realname="Shia Labeouf", port=6667):
 
 @app.route("/api/join/<channel>/")
 def getUserList(channel):
+    channel = '#' + channel
     client.send('JOIN %s' % channel)
-    """
-    while not channel in client.channels:
-        continue
+    while not channel in client.get_channels():
+        print channel
+        print client.get_channels()
+    print "successfully joined #%s" % channel
+    return json.dumps(client.get_channels()[channel])
     """
     return json.dumps(
         {   "public": True,
@@ -88,6 +91,7 @@ def getUserList(channel):
                     "nick": "PRoKoder"
                 }
             ]})
+    """
 
 #handles a character being typed
 @app.route("/api/autocompletes/")

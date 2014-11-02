@@ -108,7 +108,7 @@ class OceanClient():
         if self.nick:
             self.send("NICK %s" % self.nick)
         self.send("USER %s 0 * :%s" % (self.username,self.realname))
-        self.send("JOIN #general")
+        #self.send("JOIN #general")
         self.send("WHOIS ocean-bot")
 
     def send_command(self, command, args):
@@ -138,10 +138,13 @@ class OceanClient():
     def clear_outbuf(self):
         self.outbuf = []
 
+    def get_channels(self):
+        return self.channels
+
     def run(self):
-        input_thread = threading.Thread(target=self.read_send_loop)
-        input_thread.daemon = True
-        input_thread.start()
+        #input_thread = threading.Thread(target=self.read_send_loop)
+        #input_thread.daemon = True
+        #input_thread.start()
 
         while True:
             self.readbuf += self.socket.recv(1024).decode('UTF-8')
@@ -178,9 +181,13 @@ class OceanClient():
                         self.simple_mode = True
                     elif line[1] == '311' and line[3] == 'ocean-bot':
                         self.bot_init_plugins()
+                    elif line[1] == '332':
+                        self.channels[line[4]] = {}
+                        self.channels[line[4]]['topic'] = ' '.join(line[5:])
                     elif line[1] == '353':
                         self.channels[line[4]] = [
-                            nick.replace(':', '').strip()
+                            {'nick': nick.replace(':', '').strip(),
+                                'realname': 'Shia LaBeouf'}
                             for nick in line[5:]]
                     else:
                         #print ' '.join(line)
