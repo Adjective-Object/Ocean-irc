@@ -44,6 +44,7 @@ def getUserList(channel):
     #fake user list
     return json.dumps(
         {   "public": True,
+            "topic": "WHERE WIFI GOES TO DIE",
             "users": [
                 {   "realname": "PJ Rosa",
                     "nick": "de-mote"
@@ -104,4 +105,4 @@ def getMessages():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')

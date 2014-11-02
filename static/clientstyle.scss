@@ -25,10 +25,11 @@
     src: url(./prox-reg.ttf);
 }
 
-* {
+*, *:after, *:before {
     margin:0;
     padding:0;
     box-sizing: border-box;
+    -moz-box-sizing: border-box;
 }
 
 body,html {
@@ -137,16 +138,52 @@ $sidebar-width: 220px;
         outline: none;
     }
 
+    a[data-notif]:before{
+        opacity:1;
+        transform: scale(1,1);
+    }
+
+    a:before{        
+        opacity:0;
+        transform: scale(0,0);
+
+        content: attr(data-notif);
+        background-color:#64ddb4;
+        display:block;
+        font-family:prox-semibold;
+        position:absolute;
+
+        $dim: 20px;
+        font-size: 10px;
+        right:$dim;
+        top:50%;
+        margin-top: -($dim/2);
+        
+        height:$dim;
+        min-width:$dim;
+        width:auto;
+        border-radius:($dim/2);
+
+        text-align:center;
+        line-height:$dim;
+
+        padding-left:2px;
+        padding-top:2px;
+
+        @include transition(all, 0.3s, ease-in-out);
+    }
+
     // the triangle
+    $arrowlength: 8px;
     a:after{
         content:"";
         border:6px solid transparent;
-        border-right: 12px solid #d2e7ee;
+        border-right: $arrowlength solid #d2e7ee;
         display:block;
         width:0;
         height:0;
         position:absolute;
-        right:-12px;
+        right:-$arrowlength;
         top:50%;
         margin-top:-6px;
         z-index: 6;

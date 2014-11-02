@@ -1,5 +1,5 @@
 (function() {
-  var activeChannel, autocompletes, buildMsg, fetchMessages, handleLinkClick, initChans, joinChannel, loadAutoCompletes, messages, numChannels, setActiveChannel, sideBar, sideBarFocus, typingArea, users;
+  var activeChannel, autocompletes, buildMsg, channels, fetchMessages, handleLinkClick, initChans, joinChannel, loadAutoCompletes, me, messages, numChannels, populateChatBuffer, setActiveChannel, sideBar, sideBarFocus, typingArea;
 
   typingArea = $("textarea");
 
@@ -9,23 +9,49 @@
 
   numChannels = $("#sidebar a").length;
 
-  initChans = ["general", "mabois", "knurds"];
+  initChans = ["general", "knurds", "mabois", "urmum"];
 
   messages = {};
 
   autocompletes = [];
 
-  users = [];
+  channels = {};
 
   activeChannel = "";
 
-  window.ircapi_sendMessage = function(str) {};
+  me = "oceanman";
+
+  window.ircapi_sendMessage = function(message) {
+    var d;
+    d = {};
+    d["usr"] = me;
+    d["msg"] = message;
+    d["channel"] = activeChannel;
+    d["timestamp"] = Date.now();
+    buildMsg(d);
+    return messages["#" + activeChannel].push(d);
+  };
 
   setActiveChannel = function(chan) {
     activeChannel = chan;
     window.location.hash = "#" + chan;
     $(".ticked").removeClass("ticked");
-    return $("#sidebar a[href='#" + chan + "']").addClass("ticked");
+    $("#sidebar a[href='#" + chan + "']").addClass("ticked");
+    $("#topic").text(("#" + chan + " :: ") + channels["#" + chan]["topic"]);
+    $("#chatcontents").empty();
+    console.log(chan, messages);
+    populateChatBuffer(messages["#" + chan]);
+    return $("#sidebar a[href='#" + chan + "']").removeAttr("data-notif");
+  };
+
+  populateChatBuffer = function(msgs) {
+    var msg, _i, _len, _results;
+    _results = [];
+    for (_i = 0, _len = msgs.length; _i < _len; _i++) {
+      msg = msgs[_i];
+      _results.push(buildMsg(msg));
+    }
+    return _results;
   };
 
   handleLinkClick = function(evt) {
@@ -46,21 +72,31 @@
         } else {
           $("<a href=\"#" + channame + "\">#" + channame + "</a>").insertAfter($("#sidebar #publicChannels")).click(handleLinkClick);
         }
-        if (window.location.hash === void 0) {
-          setActiveChannel(channame);
-        } else if (window.location.hash === ("#" + channame)) {
-          setActiveChannel(channame);
-        }
         messages["#" + channame] = [];
-        return users.push(data["users"]);
+        channels["#" + channame] = data;
+        console.log(channels);
+        if (window.location.hash === void 0) {
+          return setActiveChannel(channame);
+        } else if (window.location.hash === ("#" + channame)) {
+          return setActiveChannel(channame);
+        }
       }
     });
   };
 
   buildMsg = function(msg) {
-    var icon;
+    var c, icon, n, obj, scroll;
+    c = $("#chatcontents");
+    scroll = c.scrollTop() + c.height() >= c.get(0).scrollHeight;
     icon = "./static/imgdump/placeholder.gif";
-    return $("#chatcontents").append($("<section class='post'>" + ("<img src='" + icon + "'/>") + ("<section class='name'>" + msg['usr'] + "</section>") + ("<section class='timestamp'>" + msg['timestamp'] + "</section>") + ("<section class='body'>" + msg['msg'] + "</section>") + "</section>"));
+    n = $(("<section class='post' sender='" + msg['usr'] + "'>") + ("<img src='" + icon + "'/>") + ("<section class='name'>" + msg['usr'] + "</section>") + ("<section class='timestamp'>" + msg['timestamp'] + "</section>") + "<section class='body'></section>" + "</section>");
+    obj = $(".body", n);
+    obj.text(msg['msg']).html();
+    obj.html(obj.html().replace(/\n/g, '<br/>'));
+    c.append(n);
+    if (scroll) {
+      return c.scrollTop(c.get(0).scrollHeight);
+    }
   };
 
   fetchMessages = function() {
@@ -71,7 +107,7 @@
         return console.log("error in getting userlist: ", errorThrown);
       },
       success: function(data, textStatus, jqXHR) {
-        var msg, _i, _len, _results;
+        var dval, ln, msg, _i, _len, _results;
         _results = [];
         for (_i = 0, _len = data.length; _i < _len; _i++) {
           msg = data[_i];
@@ -79,7 +115,13 @@
           if (msg["channel"].substring(1) === activeChannel) {
             _results.push(buildMsg(msg));
           } else {
-            _results.push(void 0);
+            ln = $("#sidebar a[href='" + msg["channel"] + "']");
+            dval = ln.attr("data-notif");
+            if (dval === void 0) {
+              _results.push(ln.attr("data-notif", 1));
+            } else {
+              _results.push(ln.attr("data-notif", parseInt(dval) + 1));
+            }
           }
         }
         return _results;
