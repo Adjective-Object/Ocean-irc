@@ -2,7 +2,7 @@
 
 an irc client/bot pair for implementing slack-like functionality
 
-(a reminder: this is all by max right now. everything is up for discussion)
+![IMAGE](./ocean--01.png)
 
 ##Design Goals
 

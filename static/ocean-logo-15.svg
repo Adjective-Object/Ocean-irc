@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 18.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 765 757" enable-background="new 0 0 765 757" xml:space="preserve">
+<g id="background">
+</g>
+<g id="sidebar">
+	<g>
+		<g>
+			<defs>
+				<circle id="SVGID_5_" cx="382.2" cy="378" r="367"/>
+			</defs>
+			<clipPath id="SVGID_2_">
+				<use xlink:href="#SVGID_5_"  overflow="visible"/>
+			</clipPath>
+			<circle clip-path="url(#SVGID_2_)" fill="#4A8096" cx="382.2" cy="378" r="367"/>
+			<circle clip-path="url(#SVGID_2_)" fill="#EEFDFF" cx="382.2" cy="378" r="321.1"/>
+			<path clip-path="url(#SVGID_2_)" fill="#6DB3C9" d="M744.4,513.2l-72.8-29.6l-39.5,8.1l-49-31.5l-31.6,17.5L475.5,446l-44.3,11.1
+				l-42.7,20.6l-77.5-38L247,420l-63-27l-44,23l-33-2l-47-26L9,427l-5,68.1V574h735.7C739.7,574,744.4,510.8,744.4,513.2z"/>
+			<polygon clip-path="url(#SVGID_2_)" fill="#4A8096" points="738.1,515.6 671.7,506.1 602.1,517.2 584.7,499.8 523,507.7 383,447 
+				336.3,488.7 274.6,487.2 244.6,461.8 186,460.3 118,490.3 61.1,431.8 -2.2,477.7 10.4,590 744.4,563.1 			"/>
+			<path clip-path="url(#SVGID_2_)" fill="#C1E4EA" d="M763.4,549H1c0,0-26.1,273.7,420.8,273.7S763.4,549,763.4,549z"/>
+			<path opacity="0.47" clip-path="url(#SVGID_2_)" fill="#6DB3C9" d="M424,145h-99.7c-19.4,0-37.3,15.7-37.3,35v13.5
+				c0,15,10.6,27.9,23.9,33l0.9,25.6l36-19H424c19.4,0,41-20.1,41-39.5V180C465,160.7,443.4,145,424,145z M336.5,199.8
+				c-6.9,0-12.5-5.6-12.5-12.5s5.6-12.5,12.5-12.5s12.5,5.6,12.5,12.5S343.4,199.8,336.5,199.8z M377,199.8
+				c-6.9,0-12.5-5.6-12.5-12.5s5.6-12.5,12.5-12.5c6.9,0,12.5,5.6,12.5,12.5S383.9,199.8,377,199.8z M415.9,199.8
+				c-6.9,0-12.5-5.6-12.5-12.5s5.6-12.5,12.5-12.5c6.9,0,12.5,5.6,12.5,12.5S422.8,199.8,415.9,199.8z"/>
+		</g>
+		
+			<text transform="matrix(1 0 0 1 106.335 352.4415)" fill="#6DB3C9" font-family="'ProximaNova-Bold'" font-size="102.7023" letter-spacing="10">O C E A N</text>
+	</g>
+</g>
+<g id="text">
+</g>
+</svg>
