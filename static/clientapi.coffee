@@ -17,7 +17,7 @@ me = "oceanman"
 
 window.ircapi_sendMessage = (message) ->
     d = {};
-    d["usr"] = me["usename"];
+    d["usr"] = me["username"];
     d["msg"] = message;
     d["channel"] = activeChannel;
     d["timestamp"] = Date.now();

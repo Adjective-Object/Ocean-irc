@@ -26,7 +26,7 @@ def rootRoute():
 
 @app.route("/api/connect/<hostname>/<username>/<nick>/<int:port>")
 @app.route("/api/connect/<hostname>/<username>/<nick>/")
-def handleConnect(hostname, nick, port=6667):
+def handleConnect(hostname, username, nick, port=6667):
     """
     global connected
     if not connected:
@@ -37,11 +37,10 @@ def handleConnect(hostname, nick, port=6667):
     return "already connected..."
     """
     #information about the user you just logged in as
-    return {
+    return json.dumps({
         "username": "oceanman",
         "realname": "Anon",
-        "nick": "nick"
-    }
+        "nick": "nick"})
 
 
 @app.route("/api/join/<channel>/")

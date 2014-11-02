@@ -24,7 +24,7 @@
   window.ircapi_sendMessage = function(message) {
     var d;
     d = {};
-    d["usr"] = me["usename"];
+    d["usr"] = me["username"];
     d["msg"] = message;
     d["channel"] = activeChannel;
     d["timestamp"] = Date.now();
