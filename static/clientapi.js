@@ -40,7 +40,6 @@
     $("#sidebar a[href='#" + chan + "']").addClass("ticked");
     $("#topic").text(("#" + chan + " :: ") + channels["#" + chan]["topic"]);
     $("#chatcontents").empty();
-    console.log(chan, messages);
     populateChatBuffer(messages["#" + chan]);
     return $("#sidebar a[href='#" + chan + "']").removeAttr("data-notif");
   };
@@ -76,9 +75,11 @@
         messages["#" + channame] = [];
         channels["#" + channame] = data;
         console.log(channels);
-        if (window.location.hash === void 0) {
+        console.log(window.location.hash, "#" + channame);
+        if (window.location.hash === ("#" + channame)) {
+          console.log("ACTIV!!");
           return setActiveChannel(channame);
-        } else if (window.location.hash === ("#" + channame)) {
+        } else if ((window.location.hash = void 0 && initChans.indexOf(channame) === 0)) {
           return setActiveChannel(channame);
         }
       }
@@ -109,6 +110,7 @@
       },
       success: function(data, textStatus, jqXHR) {
         var dval, ln, msg, _i, _len, _results;
+        console.log(data);
         _results = [];
         for (_i = 0, _len = data.length; _i < _len; _i++) {
           msg = data[_i];
@@ -163,10 +165,6 @@
           joinChannel(c);
         }
         initChans.reverse();
-        if (activeChannel === void 0) {
-          console.log("OKAY");
-          setActiveChannel("" + initChans[0]);
-        }
         return setInterval(fetchMessages, 100);
       }
     });
@@ -180,8 +178,7 @@
         return console.log("error in getting autocompletes: ", errorThrown);
       },
       success: function(data, textStatus, jqXHR) {
-        this.autocompletes = data;
-        return console.log(this.autocompletes);
+        return this.autocompletes = data;
       }
     });
   };
