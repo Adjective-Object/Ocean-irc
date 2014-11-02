@@ -58,8 +58,7 @@ class OceanClient():
     realname = 'Actual Cannibal Shia LaBeouf'
     password = ''
 
-    # CHANGE THIS
-    channels = ['#general']
+    channels = {}
     readbuf = ''
 
     # CODE COPIED FROM OCEANBOT
@@ -111,13 +110,25 @@ class OceanClient():
         self.send("WHOIS ocean-bot")
         #self.flushToNumeric(311)
 
+    def send_command(self, command, args):
+        if command == 'JOIN':
+            self.send('JOIN %s' % args)
+        elif command == 'NAMES':
+            self.send('NAMES %s' % args)
+        else:
+            #Blindly sends /COMMAND ARGS as COMMAND ARGS
+            self.send('%s %s' % (command, args))
+
     def read_send_loop(self):
         while True:
             line = sys.stdin.readline()
             line = line.strip()
             line = line.split(' ', 1)
-            self.send_message(line[0], line[1])
-    
+            if line[0][0] == '/':
+                self.send_command(line[0][1:], line[1])
+            else:
+                self.send_message(line[0], line[1])
+
     def run(self):
         input_thread = threading.Thread(target=self.read_send_loop)
         input_thread.daemon = True
@@ -145,18 +156,23 @@ class OceanClient():
 
                 # Numeric Messages
                 elif line[1].isdigit():
-                    if line[1] == '401' and line[2] == 'ocean-bot':
+                    if line[1] == '401' and line[3] == 'ocean-bot':
                         self.simple_mode = True
                         print 'Entering simple mode...'
-                    elif line[1] == '311' and line[2] == 'ocean-bot':
+                    elif line[1] == '311' and line[3] == 'ocean-bot':
                         self.bot_init_plugins()
+                    elif line[1] == '353':
+                        self.channels[line[4]] = [
+                            nick.replace(':', '').strip()
+                            for nick in line[5:]]
+                    else:
+                        print ' '.join(line)
                 else:
-                    print line[1]
+                    print ' '.join(line)
 
 def cli_print(line):
-    print line
     sender = line[0][1:line[0].find('!')]
-    print "%s said to %s%s" % (sender, line[2], ' '.join(line[3:]))
+    print "[%s] %s%s" % (line[2],sender, ' '.join(line[3:]))
 
 def loadPlugins(oceanCli):
     #oceanCli.plugins
