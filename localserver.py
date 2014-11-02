@@ -110,14 +110,14 @@ def getAutoCompletes():
 #string 
 @app.route("/api/pushMessage/<channel>", methods=['POST'])
 def pushMessage(channel):
-    print "pushmessage"
-    print request.form["message"]
-    client.send_message(channel, request.form["message"])
+    print channel, request.form["message"]
+    client.send_message('#' + channel, request.form["message"])
     return "{}"
 
 triggered = False
 @app.route("/api/getMessages/")
 def getMessages():
+    print "Get messages"
     out = client.read_outbuf()
     if len(out) > 0:
         print out
