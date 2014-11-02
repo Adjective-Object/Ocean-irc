@@ -37,22 +37,21 @@ body,html {
     font-family: prox-reg;
 }
 
-$sidebar-width: 200px;
+$sidebar-width: 220px;
 
 #sidebar {
     position: fixed;
 	width: $sidebar-width;
     min-height: 100%;
-    float:left;
+    float: left;
     background-color: #4a8096;
     color: #EFEFEF;
     overflow-x: hidden;
     overflow-y: auto;
-    box-shadow: inset -28px 0px 17px -20px rgba(0,0,0,0.2);
+    /*box-shadow: inset -28px 0px 17px -20px rgba(0,0,0,0.2);*/
     
     @include transition(width, 0.3s, cubic-bezier(0.77, 0, 0.175, 1));
 
-    /*
     &:after{
         content: "";
         position: absolute;
@@ -61,26 +60,25 @@ $sidebar-width: 200px;
         right: 0;
         bottom: 0;
         box-shadow: inset -28px 0px 17px -20px rgba(0,0,0,0.2);
-        z-index: 5;    
+        z-index: 5;   
+        pointer-events: none;
     }
-    */
 
     header {
-        padding-left: 13%;
-        padding-right: 5%;
+
         height: 42px;
         line-height: 42px;
         z-index: -1;
         font-family: "prox-semibold";
-        font-size: 12px;
         text-transform: uppercase;
         letter-spacing: 3px;
         border-top-color: #fff;
         border-top-style: solid;
         border-top-width: 1px;
         font-size: 10px; 
-        margin-top: 20px; 
+        margin-top: 30px; 
         margin-bottom: 20px;
+        cursor: default;
     }
     header:first-child {
         border-top-style: none;
@@ -141,16 +139,39 @@ $sidebar-width: 200px;
     background-color: #fff;
     border-color: #fff;
     border-style: solid;
-    border-left: ($sidebar-width + 100px) !important;
-    border-bottom: 100px !important;
     position: relative;
+    border: 0;
+    border-left-width: 8px;
+    border-left-color: #d2e7ee;
+    border-left-style: solid;
+    padding-bottom: 20%;
 }
-    textarea{
-        position:absolute;
-        bottom:0px;
+    #topic {
+        height: 40px;
+        line-height: 40px;
+        width: 100%;
+        background: #d2e7ee;
+        color: #6db3c9;
+        padding-left: 30px;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        font-size: 12px;
+}
+        #usercount {
+            float: right;
+        }
+    textarea {
+        border: 0;
+        border-top-width: 8px;
+        border-top-color: #d2e7ee;
+        border-top-style: solid;
+        position: absolute;
+        bottom: 0px;
         resize: none;
-        width:100%;
-        padding: 7%;
+        width: 100%;
+        padding: 15px;
+        height: 5%;
+        font-family: "prox-reg";
 }
 
 

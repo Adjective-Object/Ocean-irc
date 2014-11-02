@@ -22,47 +22,43 @@ body, html {
 
 #sidebar {
   position: fixed;
-  width: 200px;
+  width: 220px;
   min-height: 100%;
   float: left;
   background-color: #4a8096;
   color: #EFEFEF;
   overflow-x: hidden;
   overflow-y: auto;
-  box-shadow: inset -28px 0px 17px -20px rgba(0, 0, 0, 0.2);
+  /*box-shadow: inset -28px 0px 17px -20px rgba(0,0,0,0.2);*/
   -webkit-transition: width 0.3s cubic-bezier(0.77, 0, 0.175, 1);
   -moz-transition: width 0.3s cubic-bezier(0.77, 0, 0.175, 1);
   -ms-transition: width 0.3s cubic-bezier(0.77, 0, 0.175, 1);
   -o-transition: width 0.3s cubic-bezier(0.77, 0, 0.175, 1);
-  transition: width 0.3s cubic-bezier(0.77, 0, 0.175, 1);
-  /*
-  &:after{
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      box-shadow: inset -28px 0px 17px -20px rgba(0,0,0,0.2);
-      z-index: 5;    
-  }
-  */ }
+  transition: width 0.3s cubic-bezier(0.77, 0, 0.175, 1); }
+  #sidebar:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    box-shadow: inset -28px 0px 17px -20px rgba(0, 0, 0, 0.2);
+    z-index: 5;
+    pointer-events: none; }
   #sidebar header {
-    padding-left: 13%;
-    padding-right: 5%;
     height: 42px;
     line-height: 42px;
     z-index: -1;
     font-family: "prox-semibold";
-    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 3px;
     border-top-color: #fff;
     border-top-style: solid;
     border-top-width: 1px;
     font-size: 10px;
-    margin-top: 20px;
-    margin-bottom: 20px; }
+    margin-top: 30px;
+    margin-bottom: 20px;
+    cursor: default; }
   #sidebar header:first-child {
     border-top-style: none;
     margin-top: 0px;
@@ -100,7 +96,7 @@ body, html {
   #sidebar a:focus {
     outline: none; }
   #sidebar > header, #sidebar > a {
-    width: 200px; }
+    width: 220px; }
 
 #textscroll {
   -webkit-transition: margin-left 0.3s ease-in-out;
@@ -108,22 +104,45 @@ body, html {
   -ms-transition: margin-left 0.3s ease-in-out;
   -o-transition: margin-left 0.3s ease-in-out;
   transition: margin-left 0.3s ease-in-out;
-  margin-left: 200px;
+  margin-left: 220px;
   width: auto;
   min-height: 100%;
   background-color: #fff;
   border-color: #fff;
   border-style: solid;
-  border-left: 300px !important;
-  border-bottom: 100px !important;
-  position: relative; }
+  position: relative;
+  border: 0;
+  border-left-width: 8px;
+  border-left-color: #d2e7ee;
+  border-left-style: solid;
+  padding-bottom: 20%; }
+
+#topic {
+  height: 40px;
+  line-height: 40px;
+  width: 100%;
+  background: #d2e7ee;
+  color: #6db3c9;
+  padding-left: 30px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 12px; }
+
+#usercount {
+  float: right; }
 
 textarea {
+  border: 0;
+  border-top-width: 8px;
+  border-top-color: #d2e7ee;
+  border-top-style: solid;
   position: absolute;
   bottom: 0px;
   resize: none;
   width: 100%;
-  padding: 7%; }
+  padding: 15px;
+  height: 5%;
+  font-family: "prox-reg"; }
 
 body.sidebarhidden #sidebar {
   width: 0; }
