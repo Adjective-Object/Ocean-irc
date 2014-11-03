@@ -67,15 +67,15 @@ def getUserList(channel):
     client.send('JOIN %s' % channel)
     while not channel in client.get_channels():
         continue
-    """
     chandata = client.get_channels()[channel]
-    for user in chandata:
-        user['image'] = random.choice(imgs)
+    for user in chandata['users']:
+        # Scrubbing chanops @ because it's messing with message icons
+        if user['nick'][0] == '@':
+            user['nick'] = user['nick'][1:]
+        user['icon'] = random.choice(imgs)
     print chandata
-    """
-    print "FOR %s" % channel
-    print client.get_channels()
-    return json.dumps(client.get_channels()[channel])
+    #return json.dumps(client.get_channels()[channel])
+    return json.dumps(chandata)
 
 #handles a character being typed
 @app.route("/api/autocompletes/")
@@ -105,11 +105,12 @@ def pushMessage(channel):
 triggered = False
 @app.route("/api/getMessages/")
 def getMessages():
-    print "Get messages"
     out = client.read_outbuf()
     if len(out) > 0:
         print out
     client.clear_outbuf()
+    for msg in out:
+        msg['timestamp'] = float(msg['timestamp']) * 1000
     return json.dumps(out)
     """
     if random.random() < 0.5:
