@@ -112,6 +112,7 @@ class OceanClient():
         self.send("WHOIS ocean-bot")
 
     def send_command(self, command, args):
+        print "sending %s %s" % (command, args)
         if command == 'JOIN':
             self.send('JOIN %s' % args)
         elif command == 'NAMES':
@@ -121,6 +122,10 @@ class OceanClient():
             self.send('%s %s' % (command, args))
 
     def read_send_loop(self):
+        run_thread = threading.Thread(target=self.run)
+        run_thread.daemon = True
+        run_thread.start()
+
         while True:
             line = sys.stdin.readline()
             line = line.strip()
@@ -142,15 +147,13 @@ class OceanClient():
         return self.channels
 
     def run(self):
-        #input_thread = threading.Thread(target=self.read_send_loop)
-        #input_thread.daemon = True
-        #input_thread.start()
 
         while True:
             self.readbuf += self.socket.recv(1024).decode('UTF-8')
             lines = self.readbuf.split('\n')
             self.readbuf = lines.pop()
             for line in lines:
+                print line
                 line = line.split(' ')
 
                 if line[0] == 'PING':
@@ -182,11 +185,14 @@ class OceanClient():
                     elif line[1] == '311' and line[3] == 'ocean-bot':
                         self.bot_init_plugins()
                     elif line[1] == '332':
-                        self.channels[line[4]] = {}
-                        self.channels[line[4]]['public'] = True
-                        self.channels[line[4]]['topic'] = ' '.join(line[5:])
+                        if not line[3] in self.channels:
+                            self.channels[line[3]] = {}
+                        # Public doesn't belong here!!
+                        self.channels[line[3]]['public'] = True
+                        self.channels[line[3]]['topic'] = ' '.join(line[4:])
                     elif line[1] == '353':
-                        self.channels[line[4]] = {}
+                        if not line[4] in self.channels:
+                            self.channels[line[4]] = {}
                         self.channels[line[4]]['users'] = [
                             {'nick': nick.replace(':', '').strip(),
                                 'realname': 'Shia LaBeouf'}
@@ -263,4 +269,4 @@ if __name__ == "__main__":
         cli = OceanClient()
         cli.register("oceanman", "Max HH", nick="oceanman")
         cli.connect("104.236.63.94")
-        cli.run()
+        cli.read_send_loop()
