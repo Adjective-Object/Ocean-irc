@@ -1,7 +1,7 @@
 #Ocean-irc
 
 an irc client/bot pair for implementing slack-like functionality
-![IMAGE](./ocean-logo-15.png =500x)
+![IMAGE](./ocean-logo-15.png)
 ![IMAGE](./ocean--01.png)
 
 ##Design Goals
