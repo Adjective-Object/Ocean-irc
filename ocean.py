@@ -65,7 +65,6 @@ class OceanClient():
     # for web client
     outbuf = []
 
-    # CODE COPIED FROM OCEANBOT
     def __init__(self):
         loadPlugins(self)
     
@@ -74,9 +73,15 @@ class OceanClient():
 
     def send(self, msg):
         self.socket.send(msg + "\r\n")
+    
+    def extract_nick(self, line):
+        return line[1:line.find('!')]
+    
+    def extract_hostname(self, line):
+        return line[line.find('!') + 1:]
 
     def get_sender(self, line):
-        return line[0][1:line[0].find('!')]
+        return self.extract_nick(line[0])
 
     def get_recipient(self, line):
         return line[2]
@@ -108,18 +113,10 @@ class OceanClient():
         if self.nick:
             self.send("NICK %s" % self.nick)
         self.send("USER %s 0 * :%s" % (self.username,self.realname))
-        #self.send("JOIN #general")
         self.send("WHOIS ocean-bot")
 
     def send_command(self, command, args):
-        print "sending %s %s" % (command, args)
-        if command == 'JOIN':
-            self.send('JOIN %s' % args)
-        elif command == 'NAMES':
-            self.send('NAMES %s' % args)
-        else:
-            # Blindly sends /COMMAND ARGS as COMMAND ARGS
-            self.send('%s %s' % (command, args))
+        self.send('%s %s' % (command, args))
 
     def read_send_loop(self):
         run_thread = threading.Thread(target=self.run)
@@ -153,11 +150,26 @@ class OceanClient():
             lines = self.readbuf.split('\n')
             self.readbuf = lines.pop()
             for line in lines:
-                print line
                 line = line.split(' ')
 
                 if line[0] == 'PING':
                     self.send('PONG %s\r\n' % line[1])       
+
+                elif line[1] == 'JOIN':
+                    nick = self.extract_nick(line[0])
+                    chan = line[2][1:].strip()
+                    if not chan in self.channels:
+                        self.channels[chan] = {'users': []}
+                    self.channels[chan]['users'].append({
+                        'nick': nick,
+                        'realname': 'Shia LaBeouf'})
+
+                elif line[1] == 'PART':
+                    nick = self.extract_nick(line[0])
+                    chan = line[2]
+                    self.channels[chan]['users'] = [
+                        user for user in self.channels[chan]['users']
+                        if user['nick'] != nick]
 
                 elif line[1] == 'PRIVMSG':
                     # cli_print(line) #FOR DEBUG/CLI
@@ -185,23 +197,25 @@ class OceanClient():
                     elif line[1] == '311' and line[3] == 'ocean-bot':
                         self.bot_init_plugins()
                     elif line[1] == '332':
-                        if not line[3] in self.channels:
-                            self.channels[line[3]] = {}
+                        #if not line[3] in self.channels:
+                        #    self.channels[line[3]] = {}
                         # Public doesn't belong here!!
                         self.channels[line[3]]['public'] = True
                         self.channels[line[3]]['topic'] = ' '.join(line[4:])
                     elif line[1] == '353':
-                        if not line[4] in self.channels:
-                            self.channels[line[4]] = {}
+                        #if not line[4] in self.channels:
+                        #    self.channels[line[4]] = {}
                         self.channels[line[4]]['users'] = [
                             {'nick': nick.replace(':', '').strip(),
-                                'realname': 'Shia LaBeouf'}
+                             'realname': 'Shia LaBeouf'}
                             for nick in line[5:]]
                     else:
-                        #print ' '.join(line)
+                        # Unknown/unhandled numerics
+                        print ' '.join(line)
                         pass
                 else:
-                    #print ' '.join(line)
+                    # Unhandled Message Types
+                    print ' '.join(line)
                     pass
 
 def cli_print(line):
@@ -244,7 +258,6 @@ class OceanBot(object):
         self.readbuf = lines.pop()
 
         for line in lines:
-            print line
             line = line.rstrip()
             # Only spaces characters constitute whitespace
             line = line.split(' ')
@@ -254,11 +267,13 @@ class OceanBot(object):
                 self.send('PONG %s\r\n' % line[1])       
 
             # Channel/Private Messages
-            if line[1] == 'PRIVMSG':
+            elif line[1] == 'PRIVMSG':
                 if '#' in line[2]:
                     self.send_message(self.get_recipient(line), 'YOU SAID A THING')
                 if line[2] == self.nickname:
                     self.send_message(self.get_sender(line), 'hello yes i am ocean bot good day')
+            else:
+                print line
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == 'bot':
